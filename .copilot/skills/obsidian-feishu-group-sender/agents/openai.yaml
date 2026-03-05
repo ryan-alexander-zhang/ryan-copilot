@@ -1,0 +1,4 @@
+interface:
+  display_name: "Obsidian Feishu Sender"
+  short_description: "Send Obsidian markdown notes to Feishu groups."
+  default_prompt: "Use $obsidian-feishu-group-sender to convert my Obsidian markdown note into a Feishu custom bot payload and runnable curl script with secrets from environment variables."
