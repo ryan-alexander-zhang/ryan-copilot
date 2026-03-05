@@ -262,6 +262,72 @@ curl -sS -X POST \"https://api.telegram.org/bot${{TOKEN}}/sendMessage\" \\
 """
 
 
+def load_thread_map(path: Path) -> Dict[str, int]:
+    if not path.exists():
+        return {}
+
+    raw = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(raw, dict):
+        raise SystemExit(f"thread map must be a JSON object: {path}")
+
+    out: Dict[str, int] = {}
+    for key, value in raw.items():
+        if not isinstance(key, str):
+            continue
+        key_norm = key.strip().lower()
+        if not key_norm:
+            continue
+        if isinstance(value, int):
+            out[key_norm] = value
+        elif isinstance(value, str) and re.fullmatch(r"-?\d+", value.strip()):
+            out[key_norm] = int(value.strip())
+        else:
+            raise SystemExit(f"thread map value for '{key}' must be an integer")
+    return out
+
+
+def resolve_thread_id(
+    explicit_thread_id: str | None,
+    explicit_thread_key: str | None,
+    thread_map: Dict[str, int],
+) -> int | None:
+    if explicit_thread_id is not None:
+        value = explicit_thread_id.strip()
+        if re.fullmatch(r"-?\d+", value):
+            return int(value)
+        key_norm = value.lower()
+        if key_norm in thread_map:
+            return thread_map[key_norm]
+        raise SystemExit(
+            f"--thread-id '{explicit_thread_id}' is not numeric and not found in thread map. "
+            f"Available keys: {', '.join(sorted(thread_map.keys())) or '(empty)'}"
+        )
+
+    key_candidate = explicit_thread_key or os.environ.get("TELEGRAM_THREAD_KEY")
+    if key_candidate:
+        key_norm = key_candidate.strip().lower()
+        if key_norm in thread_map:
+            return thread_map[key_norm]
+        raise SystemExit(
+            f"unknown thread key '{key_candidate}'. Available keys: {', '.join(sorted(thread_map.keys())) or '(empty)'}"
+        )
+
+    env_thread = os.environ.get("TELEGRAM_THREAD_ID")
+    if not env_thread:
+        return None
+    env_thread = env_thread.strip()
+    if re.fullmatch(r"-?\d+", env_thread):
+        return int(env_thread)
+
+    key_norm = env_thread.lower()
+    if key_norm in thread_map:
+        return thread_map[key_norm]
+    raise SystemExit(
+        f"TELEGRAM_THREAD_ID='{env_thread}' is not numeric and not found in thread map. "
+        f"Available keys: {', '.join(sorted(thread_map.keys())) or '(empty)'}"
+    )
+
+
 def build_payload(
     text: str,
     chat_id: str,
@@ -292,8 +358,16 @@ def main() -> None:
     parser.add_argument("--chat-id", help="Telegram chat id; fallback env TELEGRAM_CHAT_ID")
     parser.add_argument(
         "--thread-id",
-        type=int,
-        help="Telegram message_thread_id; fallback env TELEGRAM_THREAD_ID",
+        help="Telegram message_thread_id (numeric) or thread alias key (for example digest/resource)",
+    )
+    parser.add_argument(
+        "--thread-key",
+        help="Logical thread key (for example digest/resource); fallback env TELEGRAM_THREAD_KEY",
+    )
+    parser.add_argument(
+        "--thread-map",
+        default=str(Path(__file__).resolve().parent.parent / "config" / "thread_map.json"),
+        help="JSON file mapping logical thread keys to numeric message_thread_id",
     )
     parser.add_argument(
         "--parse-mode",
@@ -329,11 +403,8 @@ def main() -> None:
     if not chat_id:
         raise SystemExit("chat id is required: pass --chat-id or set TELEGRAM_CHAT_ID")
 
-    thread_id = args.thread_id
-    if thread_id is None:
-        env_thread = os.environ.get("TELEGRAM_THREAD_ID")
-        if env_thread:
-            thread_id = int(env_thread)
+    thread_map = load_thread_map(Path(args.thread_map))
+    thread_id = resolve_thread_id(args.thread_id, args.thread_key, thread_map)
 
     meta, body = parse_front_matter(raw_text)
     tags = normalize_tags(meta)
@@ -365,6 +436,10 @@ def main() -> None:
 
     print(f"generated payload: {payload_path}")
     print(f"generated script:  {send_script_path}")
+    print("--- payload.json ---")
+    print(payload_path.read_text(encoding="utf-8"))
+    print("--- send.sh ---")
+    print(send_script_path.read_text(encoding="utf-8"))
 
 
 if __name__ == "__main__":

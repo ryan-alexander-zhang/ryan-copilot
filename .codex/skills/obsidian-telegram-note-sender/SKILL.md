@@ -10,7 +10,9 @@ description: Convert Obsidian Markdown notes into Telegram Bot API messages and 
 Require these inputs before execution:
 - `markdown_path`: absolute or relative path to an Obsidian markdown note.
 - `chat_id`: Telegram group chat ID (can be numeric or string style ID).
-- `thread_id`: Telegram topic/thread ID (`message_thread_id`) inside the group.
+- `thread_id` or `thread_key`: Telegram topic/thread target.
+  - `thread_id`: numeric `message_thread_id` or alias key (`digest`, `resource`).
+  - `thread_key`: logical alias (for example `digest`, `resource`) resolved via mapping file.
 - `token_env`: environment variable name storing the bot token. Default to `TELEGRAM_BOT_TOKEN`.
 - `unique_id` (optional): unique filename suffix. If omitted, auto-generate `YYYYmmddHHMMSS-randomhex`.
 
@@ -32,7 +34,8 @@ Run:
 python3 scripts/build_telegram_send_script.py \
   --markdown <markdown_path> \
   --chat-id <chat_id> \
-  --thread-id <thread_id> \
+  --thread-id <thread_id_or_alias> \
+  --thread-key <thread_key> \
   --token-env <token_env> \
   --output-dir <output_dir>
 ```
@@ -66,6 +69,8 @@ The script generates two files in `--output-dir`:
 - `<prefix>.<unique_id>.payload.json`: Bot API payload.
 - `<prefix>.<unique_id>.send.sh`: runnable sender script.
 
+After generation, the script also prints full contents of both files to stdout (equivalent to `cat`) so the caller can review without extra file reads.
+
 If `--output-dir` is omitted, default output directory is `/tmp`.
 
 Execute:
@@ -75,11 +80,42 @@ chmod +x <prefix>.send.sh
 <token_env>=<token_value> ./<prefix>.send.sh
 ```
 
+Execution policy:
+- Final send must run with escalated permissions (outside sandbox).
+- If a non-escalated run fails, immediately re-run with escalated permissions.
+
 Dry run without sending:
 
 ```bash
 DRY_RUN=1 <token_env>=dummy ./<prefix>.send.sh
 ```
+
+## Step 4: Confirm Before Sending
+
+1. Generate files and review printed payload/script content.
+2. Show output directly to user without re-processing.
+3. Ask for explicit confirmation.
+4. Only then execute `./<prefix>.send.sh` with escalated permissions (mandatory).
+
+## Thread Mapping Config
+
+Default mapping file:
+
+`config/thread_map.json`
+
+Example:
+
+```json
+{
+  "digest": 2,
+  "resource": 3
+}
+```
+
+Resolution order:
+1. `--thread-id` (numeric or alias key, highest priority)
+2. `--thread-key` or `TELEGRAM_THREAD_KEY`
+3. `TELEGRAM_THREAD_ID` (numeric or alias key)
 
 ## Resource Files
 
