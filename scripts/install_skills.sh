@@ -6,8 +6,8 @@ ROOT_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
 SOURCE_DIR="${ROOT_DIR}/skills"
 TARGET_DIRS=(
-  "${ROOT_DIR}/codex/skills"
-  "${ROOT_DIR}/copilot/skills"
+  "${ROOT_DIR}/.codex/skills"
+  "${ROOT_DIR}/.copilot/skills"
 )
 
 if [ ! -d "${SOURCE_DIR}" ]; then
