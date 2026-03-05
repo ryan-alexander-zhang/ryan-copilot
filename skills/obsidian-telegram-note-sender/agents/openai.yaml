@@ -1,4 +1,0 @@
-interface:
-  display_name: "Obsidian Telegram Sender"
-  short_description: "Send Obsidian markdown to Telegram topics"
-  default_prompt: "Use $obsidian-telegram-note-sender to convert my Obsidian note into Telegram Bot API payload files and a runnable curl sender script."
