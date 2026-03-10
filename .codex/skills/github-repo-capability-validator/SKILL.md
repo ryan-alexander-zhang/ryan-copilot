@@ -84,6 +84,17 @@ When README details are incomplete:
 Prefer concise architecture and flow diagrams in Mermaid when the
 repository is large enough to benefit.
 
+Default to using diagrams when the evidence is strong enough to support them.
+
+Prefer these visualization forms:
+
+- `Mermaid flowchart` for architecture and module relationships
+- `Mermaid sequenceDiagram` for request, execution, or orchestration flow
+- `Mermaid stateDiagram-v2` for state or lifecycle transitions
+- `Mermaid classDiagram` or entity-style diagrams for data and storage structures when helpful
+
+If a useful diagram cannot be supported by evidence, say so instead of fabricating one.
+
 For each capability, explicitly cover these implementation angles when evidence exists:
 
 - what technologies or frameworks are used
@@ -238,6 +249,7 @@ Each capability analysis must include:
 - state and lifecycle analysis when applicable
 - data and storage analysis when applicable
 - rebuildability notes
+- diagrams by default when supported by evidence
 
 Keep the report structured, auditable, and easy to hand off to another agent.
 
@@ -263,6 +275,8 @@ Enforce these constraints:
 - Do not use pull requests as the main evidence for a capability when the default-branch code does not confirm it.
 - Do prefer concrete implementation explanation over abstract summary when the code supports it.
 - Do distinguish clearly between proven implementation, cautious inference, and unknowns.
+- Do attempt visual explanation by default when the repository structure supports it.
+- Do not invent diagrams that cannot be justified from README and code evidence.
 
 For large repositories, prioritize analysis in this order:
 

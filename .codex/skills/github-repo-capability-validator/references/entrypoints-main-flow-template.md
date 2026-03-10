@@ -23,6 +23,7 @@ Use this template to create `02-entrypoints-and-main-flow.md`.
 - Important adapters, infra, or external-service boundaries
 - High-level state or lifecycle transitions
 - Where key data is created, transformed, stored, or emitted
+- Add a `Mermaid sequenceDiagram` and `Mermaid flowchart` by default when evidence supports them
 
 ### 4. Architecture Notes
 
@@ -30,6 +31,8 @@ Use this template to create `02-entrypoints-and-main-flow.md`.
 - Important boundaries between layers
 - Cross-cutting concerns such as config, cache, telemetry, persistence, auth, or transport
 - Core technology choices that shape implementation
+- Add a `Mermaid stateDiagram-v2` when lifecycle stages are explicit
+- Add a `Mermaid classDiagram` when shared data and storage structures are clear
 
 ### 5. Shared Evidence for Capability Tasks
 

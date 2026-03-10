@@ -65,6 +65,7 @@ Required contents:
 - architecture notes
 - shared evidence for later capability tasks
 - open questions
+- diagrams by default when evidence supports them
 
 Use `references/entrypoints-main-flow-template.md`.
 
@@ -103,25 +104,27 @@ Repeat the following block once per capability in its own file.
 - State transitions and triggers
 - Failure, retry, rollback, or cleanup paths when visible
 - If no meaningful state machine exists, say so explicitly
+- Add a `Mermaid stateDiagram-v2` when the lifecycle is concrete enough
 
 ## 6. Data and Storage Analysis
 - Main inputs and outputs
 - Data transformations
 - Storage, cache, registry, queue, database, index, or file boundaries
 - Persistence scope and lifecycle
+- Add a `Mermaid classDiagram` or equivalent data-structure diagram when it clarifies the model
 
 ## 7. Architecture Analysis
 - Modules and subsystem roles
 - Static relationships
 - Dependency shape
-- Mermaid diagram if helpful
+- Add a `Mermaid flowchart` by default when it clarifies the structure
 
 ## 8. Core Call Path
 - Entry point
 - Intermediate processing
 - State or data transitions
 - Output node
-- Sequence or flow diagram if helpful
+- Add a `Mermaid sequenceDiagram` by default when the call path is non-trivial
 
 ## 9. Key Technical Points
 - Frameworks, protocols, structures, patterns, algorithms
@@ -176,7 +179,18 @@ Suggested verification table:
 
 ## Mermaid Suggestions
 
-Use only when they clarify structure:
+Default to including diagrams when evidence is sufficient and the diagram improves understanding.
+
+Prefer:
+
+- `Mermaid flowchart` for architecture
+- `Mermaid sequenceDiagram` for call path
+- `Mermaid stateDiagram-v2` for state and lifecycle
+- `Mermaid classDiagram` for data and storage structure
+
+If a diagram would require guessing, omit it and state why.
+
+Examples:
 
 Architecture:
 
@@ -201,6 +215,33 @@ sequenceDiagram
   C->>X: optional remote call
   C-->>E: result
   E-->>U: output
+```
+
+State and lifecycle:
+
+```mermaid
+stateDiagram-v2
+  [*] --> Idle
+  Idle --> Running: trigger
+  Running --> Waiting: external dependency
+  Waiting --> Running: resume
+  Running --> Failed: error
+  Running --> Completed: success
+  Failed --> [*]
+  Completed --> [*]
+```
+
+Data and storage:
+
+```mermaid
+classDiagram
+  class Input
+  class CoreState
+  class Cache
+  class PersistedRecord
+  Input --> CoreState
+  CoreState --> Cache
+  CoreState --> PersistedRecord
 ```
 
 ## Evidence Checklist
