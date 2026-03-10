@@ -1,0 +1,4 @@
+interface:
+  display_name: "GitHub Capability Validator"
+  short_description: "Analyze README claims and verify them in code."
+  default_prompt: "Use $github-repo-capability-validator to extract a repository's core capabilities from its README, write per-capability technical analyses, and verify each claim against the codebase."
