@@ -1,0 +1,15 @@
+.env
+**/.env
+
+# macOS
+.DS_Store
+**/.DS_Store
+
+# IntelliJ IDEA
+.idea/
+**/.idea/
+*.iml
+
+# VS Code
+.vscode/
+**/.vscode/
