@@ -1,0 +1,4 @@
+interface:
+  display_name: "Markdownlint CLI2 Validator"
+  short_description: "Lint Markdown, auto-fix first, report remaining errors."
+  default_prompt: "Use $markdownlint-cli2-validator to validate Markdown files with markdownlint-cli2, try --fix first, and return any remaining lint report based on the exit code."
