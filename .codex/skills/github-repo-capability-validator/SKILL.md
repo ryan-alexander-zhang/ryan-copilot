@@ -13,6 +13,8 @@ This skill is designed to prevent shallow README paraphrasing. It enforces a str
 
 `clone -> README claims -> capability extraction -> task breakdown -> shared main-flow analysis -> per-capability technical analysis -> code verification -> consistency report bundle`
 
+The reports should be strong enough to help a reader reconstruct how the product works, not just restate README claims. Prefer concrete explanations of implementation mechanics, state flow, data flow, storage, and external dependency boundaries.
+
 ## Inputs
 
 Collect these inputs when available:
@@ -82,6 +84,16 @@ When README details are incomplete:
 Prefer concise architecture and flow diagrams in Mermaid when the
 repository is large enough to benefit.
 
+For each capability, explicitly cover these implementation angles when evidence exists:
+
+- what technologies or frameworks are used
+- how execution or state transitions flow
+- how data enters, transforms, and exits the system
+- where data is stored, cached, indexed, or persisted
+- what a minimal rebuild of the capability would require
+
+The goal is not only validation. The goal is also to make the capability understandable enough that a reader could plausibly reproduce the product design from the report.
+
 Before capability deep dives, write a task breakdown document that decomposes the work into:
 
 - README-only extraction task
@@ -109,6 +121,14 @@ For each capability, explicitly report:
 - which are only partially implemented;
 - which are not verified;
 - `README claim / code reality / likely reason for mismatch` when they differ.
+
+When the code supports it, also verify:
+
+- concrete technology choices
+- state or lifecycle transitions
+- data model and storage boundaries
+- key external-service dependencies
+- minimum modules required to rebuild the capability
 
 Never invent modules, classes, functions, or call chains. If code
 evidence is weak, say `insufficient to verify`.
@@ -214,6 +234,10 @@ Each capability analysis must include:
 - validation status
 - mismatch classification when applicable
 - evidence grade when useful
+- implementation mechanics
+- state and lifecycle analysis when applicable
+- data and storage analysis when applicable
+- rebuildability notes
 
 Keep the report structured, auditable, and easy to hand off to another agent.
 
@@ -237,6 +261,8 @@ Enforce these constraints:
 - Call out external-service dependencies when a claimed capability
   only works with SaaS or remote systems.
 - Do not use pull requests as the main evidence for a capability when the default-branch code does not confirm it.
+- Do prefer concrete implementation explanation over abstract summary when the code supports it.
+- Do distinguish clearly between proven implementation, cautious inference, and unknowns.
 
 For large repositories, prioritize analysis in this order:
 

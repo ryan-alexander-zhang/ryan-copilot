@@ -93,24 +93,41 @@ Repeat the following block once per capability in its own file.
 - Limits and scope
 - Mark inference clearly when README is thin
 
-## 4. Architecture Analysis
+## 4. Implementation Mechanics
+- Primary technologies, frameworks, libraries, protocols, or patterns
+- Why these choices appear to be used here
+- Core implementation strategy
+
+## 5. State and Lifecycle Analysis
+- Main states, phases, or lifecycle stages
+- State transitions and triggers
+- Failure, retry, rollback, or cleanup paths when visible
+- If no meaningful state machine exists, say so explicitly
+
+## 6. Data and Storage Analysis
+- Main inputs and outputs
+- Data transformations
+- Storage, cache, registry, queue, database, index, or file boundaries
+- Persistence scope and lifecycle
+
+## 7. Architecture Analysis
 - Modules and subsystem roles
 - Static relationships
 - Dependency shape
 - Mermaid diagram if helpful
 
-## 5. Core Call Path
+## 8. Core Call Path
 - Entry point
 - Intermediate processing
 - State or data transitions
 - Output node
 - Sequence or flow diagram if helpful
 
-## 6. Key Technical Points
+## 9. Key Technical Points
 - Frameworks, protocols, structures, patterns, algorithms
 - Highest-value code-reading targets
 
-## 7. Code Verification
+## 10. Code Verification
 - Code locations
 - Key modules, classes, functions, configs
 - Whether README claim is implemented
@@ -118,14 +135,19 @@ Repeat the following block once per capability in its own file.
 - Unconfirmed parts
 - Mismatches
 
-## 8. Consistency Check
+## 11. Rebuildability
+- Minimum modules or subsystems needed to reproduce the capability
+- External dependencies that cannot be reconstructed from the repo alone
+- What is clear enough to rebuild vs still unclear
+
+## 12. Consistency Check
 - README claim
 - Code reality
 - Gap summary
 - Mismatch classification if applicable
 - Possible explanation for discrepancy
 
-## 9. Conclusion
+## 13. Conclusion
 - Exists: yes / partial / insufficient evidence
 - Confidence: high / medium / low
 - Validation status: Validated / Partially Validated / Insufficient Evidence / README Claim Not Supported / Implemented but Under-Documented
