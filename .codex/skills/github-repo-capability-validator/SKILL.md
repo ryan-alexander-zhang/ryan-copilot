@@ -12,14 +12,27 @@ Collect these inputs when available:
 - `repo_url`: GitHub repository URL.
 - `readme_content`: README text or README file path.
 - `repo_root` or checked out source tree.
+- `report_output_dir`: fixed report directory in the current workspace. Default: `reports/`.
+- `report_filename`: default `<repo-name>-capability-audit.md`, derived from the analyzed repository name.
 - Optional `docs/`, configuration files, interface definitions, and key entrypoints.
-- Optional permission to browse public docs, issues, or project pages.
+- Optional permission to inspect GitHub pull requests with `gh` for recent implementation context.
 
-If the repository is not checked out locally, say what can and cannot be validated.
+If the repository is not checked out locally, clone it locally before Stage 3.
+If cloning fails, stop and report that code verification could not be completed.
 
 ## Workflow
 
 Execute the work in three stages and keep them separate.
+
+Before Stage 1:
+
+- If `repo_root` is not already available locally, clone the repository first.
+- Prefer a local checkout of the default branch.
+- If clone fails for any reason, stop instead of falling back to webpage-only verification.
+- You may read the README from GitHub before clone only when needed to identify the repository, but do not use webpage inspection as a substitute for a local code tree.
+- Create the report output directory in the current workspace if it does not already exist.
+- Plan to write the final Markdown report into the current workspace, not into the analyzed repository.
+- Derive the report filename from the repository name using this fixed convention: `<repo-name>-capability-audit.md`.
 
 ### Stage 1: Extract Claimed Core Capabilities From README Only
 
@@ -80,6 +93,12 @@ For each capability, explicitly report:
 Never invent modules, classes, functions, or call chains. If code
 evidence is weak, say `insufficient to verify`.
 
+Optional enhancement:
+
+- Use `gh` to inspect relevant pull requests only after default-branch code verification is complete.
+- Treat PRs as supporting evidence for implementation history or README drift, not as the primary proof of current capability.
+- Do not mark a capability as implemented based on PR discussion alone when current code does not support it.
+
 ## Evidence Rules
 
 Attach evidence to every conclusion:
@@ -97,9 +116,15 @@ Use stronger confidence only when README and code line up cleanly.
 
 Use fast repository inspection first:
 
+- local clone or existing local checkout
 - `rg --files`
 - `rg "<capability keyword>|<domain term>|<config key>"`
 - targeted reads of README, docs, config, and entrypoints
+
+Then optionally deepen verification with:
+
+- `gh pr list` / `gh pr view` for capability-related implementation history
+- recent merged PRs when README claims and current code appear misaligned
 
 Validate behavior through implementation markers such as:
 
@@ -112,6 +137,7 @@ Validate behavior through implementation markers such as:
 - tests that prove the capability is intended to work
 
 Treat tests and docs as supporting evidence, not a replacement for implementation.
+Treat PRs the same way: supporting evidence, never a replacement for implementation in the checked out code.
 
 ## Output Contract
 
@@ -125,6 +151,7 @@ Always deliver:
    - overall README/code consistency judgment
    - key risks
    - five priority code entrypoints for deeper study
+4. Write the complete report to `report_output_dir/<repo-name>-capability-audit.md` under the current workspace.
 
 Keep the report structured, auditable, and easy to hand off to another agent.
 
@@ -132,6 +159,11 @@ Keep the report structured, auditable, and easy to hand off to another agent.
 
 Enforce these constraints:
 
+- Do not skip local clone when analyzing a remote GitHub repository.
+- Do not continue to Stage 3 if clone fails.
+- Do not write the generated report into the analyzed repository by default.
+- Do write the generated report into the current workspace's fixed report directory by default.
+- Do use the fixed filename pattern `<repo-name>-capability-audit.md` by default.
 - Do not backfill capability definitions from code during Stage 1.
 - Do not treat tooling or peripheral features as core capabilities.
 - Do not present README claims as facts until code verification is complete.
@@ -139,6 +171,7 @@ Enforce these constraints:
 - Do not over-claim architecture details when the repository lacks evidence.
 - Call out external-service dependencies when a claimed capability
   only works with SaaS or remote systems.
+- Do not use pull requests as the main evidence for a capability when the default-branch code does not confirm it.
 
 ## Resource Files
 

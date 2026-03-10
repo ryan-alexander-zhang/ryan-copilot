@@ -2,6 +2,12 @@
 
 Use this structure for every repository analysis.
 
+Output location:
+
+- Write the final report as a Markdown file under the current workspace's fixed `reports/` directory by default.
+- Use the fixed filename pattern `<repo-name>-capability-audit.md`.
+- Do not place the report inside the analyzed repository unless the user explicitly asks for that.
+
 ## Stage 1: README Core Capability Extraction
 
 Output:
@@ -17,6 +23,11 @@ Suggested table:
 
 | Capability | README evidence | Boundary | Initial confidence |
 | --- | --- | --- | --- |
+
+Prerequisite:
+
+- Confirm the repository has been cloned locally or an equivalent local checkout already exists.
+- If local clone failed, stop the analysis and report the blocker instead of producing Stage 3 verification.
 
 ## Stage 2: Per-Capability Technical Analysis
 
@@ -83,6 +94,9 @@ Always end with:
 - `README vs code consistency`
 - `Key risks`
 - `Top 5 code entrypoints`
+- `Clone status`
+- `PR evidence used? yes/no`
+- `Report path in current workspace`
 
 Suggested verification table:
 
@@ -123,7 +137,10 @@ sequenceDiagram
 Before finalizing, check:
 
 - Every capability came from README, not reverse-engineering from code.
+- The repository was cloned locally before code verification began.
 - Every conclusion cites README evidence.
 - Every verification cites concrete code evidence.
 - Every mismatch is explicit.
 - Every confidence level matches evidence quality.
+- Any PR evidence is explicitly labeled as secondary to current code evidence.
+- The final report was written to the current workspace `reports/` directory.

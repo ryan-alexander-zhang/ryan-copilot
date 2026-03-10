@@ -1,4 +1,4 @@
 interface:
   display_name: "GitHub Capability Validator"
   short_description: "Analyze README claims and verify them in code."
-  default_prompt: "Use $github-repo-capability-validator to extract a repository's core capabilities from its README, write per-capability technical analyses, and verify each claim against the codebase."
+  default_prompt: "Use $github-repo-capability-validator to extract a repository's core capabilities from its README, clone the repository locally, write per-capability technical analyses, verify each claim against the checked out codebase, and save the final Markdown report into the current workspace's fixed reports/ directory using the filename pattern <repo-name>-capability-audit.md. If clone fails, stop and report the blocker. Use GitHub PRs only as secondary supporting evidence."
