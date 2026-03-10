@@ -1,9 +1,17 @@
 ---
 name: github-repo-capability-validator
-description: Extract a GitHub repository's claimed core capabilities from README content, write per-capability technical analysis documents, and verify every claim against the actual codebase. Use when asked to analyze a public or local repository from its README first, avoid capability backfilling from code, compare README claims with implementation, or produce structured evidence-backed capability reports with confidence ratings.
+description: "Analyze a GitHub repository from a strict README-first workflow: clone locally, extract claimed core capabilities from the README, decompose the work into reviewable task documents, produce shared and per-capability technical analyses, verify each claim against the checked out codebase, and write an evidence-backed consistency report bundle."
 ---
 
 # GitHub Repo Capability Validator
+
+## Purpose
+
+Analyze a GitHub repository by first extracting the project's claimed core capabilities from the README, then generating task-oriented technical analysis documents, and finally validating each analysis against the actual source code.
+
+This skill is designed to prevent shallow README paraphrasing. It enforces a strict path:
+
+`clone -> README claims -> capability extraction -> task breakdown -> shared main-flow analysis -> per-capability technical analysis -> code verification -> consistency report bundle`
 
 ## Inputs
 
@@ -14,6 +22,7 @@ Collect these inputs when available:
 - `repo_root` or checked out source tree.
 - `report_output_dir`: fixed report directory in the current workspace. Default: `reports/`.
 - `report_filename`: default `<repo-name>-capability-audit.md`, derived from the analyzed repository name.
+- `report_bundle_dir`: default `reports/<repo-name>-capability-audit/` for task-oriented multi-file output.
 - Optional `docs/`, configuration files, interface definitions, and key entrypoints.
 - Optional permission to inspect GitHub pull requests with `gh` for recent implementation context.
 
@@ -33,6 +42,8 @@ Before Stage 1:
 - Create the report output directory in the current workspace if it does not already exist.
 - Plan to write the final Markdown report into the current workspace, not into the analyzed repository.
 - Derive the report filename from the repository name using this fixed convention: `<repo-name>-capability-audit.md`.
+- Derive the report bundle directory from the repository name using this fixed convention: `<repo-name>-capability-audit/`.
+- Create a task breakdown document before deep code verification so the work is explicitly decomposed.
 
 ### Stage 1: Extract Claimed Core Capabilities From README Only
 
@@ -70,6 +81,15 @@ When README details are incomplete:
 
 Prefer concise architecture and flow diagrams in Mermaid when the
 repository is large enough to benefit.
+
+Before capability deep dives, write a task breakdown document that decomposes the work into:
+
+- README-only extraction task
+- entrypoints and main-flow task
+- one task per capability
+- final consistency summary task
+
+Prefer task decomposition by investigation stage, not only by capability name, so shared code-reading work is done once and reused.
 
 ### Stage 3: Verify Against Code
 
@@ -112,6 +132,37 @@ Add a confidence rating to each capability: `high`, `medium`, or `low`.
 
 Use stronger confidence only when README and code line up cleanly.
 
+Add a validation status to each capability. This is required.
+
+Use one of:
+
+- `Validated`
+- `Partially Validated`
+- `Insufficient Evidence`
+- `README Claim Not Supported`
+- `Implemented but Under-Documented`
+
+Evidence grade is optional but recommended when it improves rigor.
+
+Suggested evidence grades:
+
+- `A`: README and code both clearly support the conclusion
+- `B`: code supports it, but README is vague
+- `C`: README strongly claims it, but code only partially supports it
+- `D`: only README mentions it, code does not support it
+
+When README and code differ, add a mismatch classification. This is required when a mismatch exists.
+
+Use one of:
+
+- `README described, code not implemented`
+- `README described, code partially implemented`
+- `code implemented, README under-describes it`
+- `same meaning, different naming`
+- `depends on external platform or service, cannot be fully verified in repo`
+- `placeholder or scaffolding only`
+- `roadmap mistakenly presented as present capability`
+
 ## Verification Heuristics
 
 Use fast repository inspection first:
@@ -143,15 +194,26 @@ Treat PRs the same way: supporting evidence, never a replacement for implementat
 
 Always deliver:
 
-1. README-only capability extraction.
-2. One full analysis per capability.
-3. A final overview report with:
+1. A task breakdown document in `report_output_dir/<repo-name>-capability-audit/00-task-breakdown.md`.
+2. A README-only extraction document in `report_output_dir/<repo-name>-capability-audit/01-readme-capability-extraction.md`.
+3. An entrypoints and main-flow document in `report_output_dir/<repo-name>-capability-audit/02-entrypoints-and-main-flow.md`.
+4. One capability document per capability in `report_output_dir/<repo-name>-capability-audit/` using a stable numbered filename such as `03-capability-<name>.md`.
+5. A final overview report with:
    - capability summary table
    - verification status per capability
    - overall README/code consistency judgment
    - key risks
    - five priority code entrypoints for deeper study
-4. Write the complete report to `report_output_dir/<repo-name>-capability-audit.md` under the current workspace.
+6. A final summary document in `report_output_dir/<repo-name>-capability-audit/99-final-consistency-summary.md`.
+
+The single-file report `report_output_dir/<repo-name>-capability-audit.md` is optional. Prefer the task-oriented report bundle as the default output.
+
+Each capability analysis must include:
+
+- confidence
+- validation status
+- mismatch classification when applicable
+- evidence grade when useful
 
 Keep the report structured, auditable, and easy to hand off to another agent.
 
@@ -164,6 +226,9 @@ Enforce these constraints:
 - Do not write the generated report into the analyzed repository by default.
 - Do write the generated report into the current workspace's fixed report directory by default.
 - Do use the fixed filename pattern `<repo-name>-capability-audit.md` by default.
+- Do use the fixed multi-file report bundle directory `<repo-name>-capability-audit/` by default.
+- Do create `00-task-breakdown.md` before deep verification work.
+- Do decompose work into reviewable task documents with smaller scope.
 - Do not backfill capability definitions from code during Stage 1.
 - Do not treat tooling or peripheral features as core capabilities.
 - Do not present README claims as facts until code verification is complete.
@@ -173,7 +238,34 @@ Enforce these constraints:
   only works with SaaS or remote systems.
 - Do not use pull requests as the main evidence for a capability when the default-branch code does not confirm it.
 
+For large repositories, prioritize analysis in this order:
+
+1. README-described main flows
+2. entrypoint modules
+3. orchestration layer
+4. core engine or execution layer
+5. infra or adapter layer
+6. tests that prove behavior
+
+If the repository cannot be fully analyzed, explicitly state why.
+Common reasons include:
+
+- README too vague
+- missing source code for a key capability
+- capability depends on a hosted service not present in the repo
+- code layout too fragmented to verify efficiently
+- examples exist but the production path is unclear
+
+In those cases, still provide:
+
+- best-effort capability extraction
+- partial evidence
+- uncertainty notes
+- recommended next files to inspect
+
 ## Resource Files
 
 - `references/report-template.md`: fixed document skeleton,
   evidence checklist, and Mermaid suggestions.
+- `references/task-breakdown-template.md`: template for decomposing the analysis into reviewable tasks.
+- `references/entrypoints-main-flow-template.md`: template for the shared entrypoint and main-flow investigation.

@@ -1,12 +1,35 @@
 # Report Template
 
-Use this structure for every repository analysis.
+Use this structure for the report bundle and the final summary report.
 
 Output location:
 
-- Write the final report as a Markdown file under the current workspace's fixed `reports/` directory by default.
+- Write the analysis as a multi-file report bundle under the current workspace's fixed `reports/` directory by default.
+- Use the bundle directory pattern `<repo-name>-capability-audit/`.
 - Use the fixed filename pattern `<repo-name>-capability-audit.md`.
 - Do not place the report inside the analyzed repository unless the user explicitly asks for that.
+
+Recommended bundle layout:
+
+- `00-task-breakdown.md`
+- `01-readme-capability-extraction.md`
+- `02-entrypoints-and-main-flow.md`
+- `03-capability-<name>.md` and onward
+- `99-final-consistency-summary.md`
+
+## Stage 0: Task Breakdown
+
+Create `00-task-breakdown.md` first.
+
+Required contents:
+
+- repository metadata
+- task table
+- dependencies
+- status tracking
+- notes on blockers and external dependencies
+
+Use `references/task-breakdown-template.md`.
 
 ## Stage 1: README Core Capability Extraction
 
@@ -29,9 +52,25 @@ Prerequisite:
 - Confirm the repository has been cloned locally or an equivalent local checkout already exists.
 - If local clone failed, stop the analysis and report the blocker instead of producing Stage 3 verification.
 
+Write this stage to `01-readme-capability-extraction.md`.
+
+## Stage 1.5: Entrypoints and Main Flow
+
+Before capability deep dives, create a shared code-reading skeleton in `02-entrypoints-and-main-flow.md`.
+
+Required contents:
+
+- key entrypoints
+- main flow skeleton
+- architecture notes
+- shared evidence for later capability tasks
+- open questions
+
+Use `references/entrypoints-main-flow-template.md`.
+
 ## Stage 2: Per-Capability Technical Analysis
 
-Repeat the following block once per capability.
+Repeat the following block once per capability in its own file.
 
 ```markdown
 # {Capability name}
@@ -79,15 +118,24 @@ Repeat the following block once per capability.
 - Unconfirmed parts
 - Mismatches
 
-## 8. Conclusion
+## 8. Consistency Check
+- README claim
+- Code reality
+- Gap summary
+- Mismatch classification if applicable
+- Possible explanation for discrepancy
+
+## 9. Conclusion
 - Exists: yes / partial / insufficient evidence
 - Confidence: high / medium / low
+- Validation status: Validated / Partially Validated / Insufficient Evidence / README Claim Not Supported / Implemented but Under-Documented
+- Evidence grade: A / B / C / D (optional)
 - Next code entrypoints
 ```
 
 ## Stage 3: Final Overview
 
-Always end with:
+Always end the bundle with `99-final-consistency-summary.md`, containing:
 
 - `Capability summary table`
 - `Verification status`
@@ -97,11 +145,12 @@ Always end with:
 - `Clone status`
 - `PR evidence used? yes/no`
 - `Report path in current workspace`
+- `Task bundle contents`
 
 Suggested verification table:
 
-| Capability | README claim summary | Code verdict | Key evidence | Confidence |
-| --- | --- | --- | --- | --- |
+| Capability | README claim summary | Code verdict | Validation status | Key evidence | Confidence |
+| --- | --- | --- | --- | --- | --- |
 
 ## Mermaid Suggestions
 
@@ -138,9 +187,14 @@ Before finalizing, check:
 
 - Every capability came from README, not reverse-engineering from code.
 - The repository was cloned locally before code verification began.
+- A task breakdown document exists and reflects the work decomposition.
+- A shared entrypoints and main-flow document exists before deep capability files.
 - Every conclusion cites README evidence.
 - Every verification cites concrete code evidence.
 - Every mismatch is explicit.
+- Every capability includes a validation status.
+- Any mismatch includes a mismatch classification.
 - Every confidence level matches evidence quality.
 - Any PR evidence is explicitly labeled as secondary to current code evidence.
 - The final report was written to the current workspace `reports/` directory.
+- Evidence grade is present when it materially improves rigor.
