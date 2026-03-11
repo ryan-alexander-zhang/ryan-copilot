@@ -28,6 +28,19 @@ Collect these inputs when available:
 - Optional `docs/`, configuration files, interface definitions, and key entrypoints.
 - Optional permission to inspect GitHub pull requests with `gh` for recent implementation context.
 
+## Safety Policy
+
+Default to static analysis only.
+
+- You may clone the repository locally for inspection.
+- Do read README, docs, configuration, manifests, tests, and source files.
+- Do not install dependencies by default.
+- Do not run tests, builds, package managers, project scripts, containers, binaries, or application code by default.
+- Do not execute repository code just because it would improve confidence.
+- Only run repository-affecting or code-executing commands when the user explicitly asks for runtime verification or clearly authorizes execution for that turn.
+- If runtime execution is not authorized, report that validation is based on static inspection only.
+- If runtime execution is authorized, prefer the narrowest command set needed and call out security risk from untrusted repository code before or while requesting approval when required.
+
 If the repository is not checked out locally, clone it locally before Stage 3.
 If cloning fails, stop and report that code verification could not be completed.
 
@@ -125,6 +138,10 @@ Return to the repository and verify each analysis using:
 - classes, functions, handlers, services, pipelines, prompts,
   schemas, or workflow definitions.
 
+By default, perform this stage through static code verification only.
+Do not treat dependency installation, test execution, builds, or running repository programs as part of the default workflow.
+Only add runtime verification when the user explicitly requests it.
+
 For each capability, explicitly report:
 
 - code locations that support or refute it;
@@ -221,6 +238,12 @@ Validate behavior through implementation markers such as:
 Treat tests and docs as supporting evidence, not a replacement for implementation.
 Treat PRs the same way: supporting evidence, never a replacement for implementation in the checked out code.
 
+Runtime heuristics are opt-in only:
+
+- If the user has not explicitly authorized execution, do not run `npm install`, `pnpm install`, `yarn`, `pip install`, `poetry install`, `cargo build`, `go test`, `pytest`, `npm test`, `make`, `docker`, project binaries, or repository scripts.
+- In the default mode for this skill, tests may be read as evidence but not executed.
+- When execution is authorized, keep it minimal and relevant to the claimed capability being verified.
+
 ## Output Contract
 
 Always deliver:
@@ -275,6 +298,8 @@ Enforce these constraints:
 - Do not use pull requests as the main evidence for a capability when the default-branch code does not confirm it.
 - Do prefer concrete implementation explanation over abstract summary when the code supports it.
 - Do distinguish clearly between proven implementation, cautious inference, and unknowns.
+- Do default to non-executing static inspection and say so in the report when no runtime authorization was provided.
+- Do not install dependencies, run tests, build artifacts, or execute repository code unless the user explicitly requested runtime verification.
 - Do attempt visual explanation by default when the repository structure supports it.
 - Do not invent diagrams that cannot be justified from README and code evidence.
 

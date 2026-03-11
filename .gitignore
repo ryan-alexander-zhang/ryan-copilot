@@ -13,3 +13,6 @@
 # VS Code
 .vscode/
 **/.vscode/
+
+# Local cloned repositories
+repos/
