@@ -1,16 +1,91 @@
-# Obsidian Sender Skills
+# Skills Overview
 
-本仓库使用以下 Skill 目录，不再使用根目录 `./skills`：
+本仓库主要维护 Codex/Copilot 可复用 skills。当前不使用根目录 `./skills`，而是使用：
 
 - `.codex/skills/...`
 - `.copilot/skills/...`
 
-当前包含两个发送 Skill：
+其中 `.codex/skills` 是主维护目录；`.copilot/skills` 目前只保留部分发送类 skill 的副本。
 
-- `obsidian-feishu-group-sender`
-- `obsidian-telegram-note-sender`
+## 当前 Skills
 
-## Obsidian -> Feishu 群组发送
+### `.codex/skills`
+
+| Skill | 作用 | 路径 |
+| --- | --- | --- |
+| `alphaxiv-paper-lookup` | 通过 alphaxiv 获取 arXiv 论文的结构化 AI 摘要，避免直接读原始 PDF | `.codex/skills/alphaxiv-paper-lookup` |
+| `github-repo-capability-validator` | 对 GitHub 仓库执行 README-first 的 capability 分析、代码核验、任务拆分和报告输出 | `.codex/skills/github-repo-capability-validator` |
+| `markdownlint-cli2-validator` | 用 `markdownlint-cli2` 校验和自动修复 Markdown | `.codex/skills/markdownlint-cli2-validator` |
+| `obsidian-feishu-group-sender` | 将 Obsidian Markdown 转成 Feishu 机器人消息并生成可执行发送脚本 | `.codex/skills/obsidian-feishu-group-sender` |
+| `obsidian-telegram-note-sender` | 将 Obsidian Markdown 转成 Telegram Bot API 消息并生成可执行发送脚本 | `.codex/skills/obsidian-telegram-note-sender` |
+
+### `.copilot/skills`
+
+| Skill | 作用 | 路径 |
+| --- | --- | --- |
+| `obsidian-feishu-group-sender` | Feishu 群消息发送副本 | `.copilot/skills/obsidian-feishu-group-sender` |
+| `obsidian-telegram-note-sender` | Telegram 话题消息发送副本 | `.copilot/skills/obsidian-telegram-note-sender` |
+
+## 重点 Skills
+
+### GitHub Repo Capability Validator
+
+- Skill 路径: `.codex/skills/github-repo-capability-validator`
+- 作用: 对 GitHub 仓库做严格的 README-first capability 分析，并输出可 review 的 Markdown 报告 bundle
+
+当前能力：
+
+- 先 `git clone` 仓库，本地分析默认分支源码
+- 从 README 提取核心 capabilities，避免代码反推 capability
+- 输出任务拆分文档、入口/主流程文档、逐 capability 文档和最终汇总文档
+- 对每个 capability 做代码核验
+- 默认尽量输出 Mermaid 图：
+  - 架构图
+  - 调用时序图
+  - 状态/生命周期图
+  - 数据/存储结构图
+- 报告默认写到：
+  - `reports/<repo-name>-capability-audit/`
+
+典型输出结构：
+
+- `00-task-breakdown.md`
+- `01-readme-capability-extraction.md`
+- `02-entrypoints-and-main-flow.md`
+- `03-capability-<name>.md`
+- `99-final-consistency-summary.md`
+
+适用场景：
+
+- 分析一个 GitHub 仓库 README 中的核心能力到底怎么实现
+- 核对 README claim 和代码现实是否一致
+- 生成足够支撑“复刻级理解”的工程分析报告
+
+### AlphaXiv Paper Lookup
+
+- Skill 路径: `.codex/skills/alphaxiv-paper-lookup`
+- 作用: 给出 arXiv 论文的结构化概览，适合快速理解研究论文
+
+适用场景：
+
+- 用户给出 arXiv 链接或 paper ID
+- 需要快速总结或解释一篇论文
+- 希望用比 PDF 更适合 LLM/agent 的结构化内容做分析
+
+### Markdownlint CLI2 Validator
+
+- Skill 路径: `.codex/skills/markdownlint-cli2-validator`
+- 作用: 校验 Markdown 文件格式，默认先尝试自动修复，再输出剩余 lint 问题
+
+适用场景：
+
+- 检查 `.md` 文件或文档目录
+- 自动修复 markdownlint-cli2 可修复的问题
+- 生成剩余 lint 报告
+
+## Obsidian Sender Skills
+
+### Obsidian -> Feishu 群组发送
 
 - Skill 路径: `.codex/skills/obsidian-feishu-group-sender`（`.copilot` 下也有同名副本）
 - 生成脚本: `.codex/skills/obsidian-feishu-group-sender/scripts/build_feishu_send_script.py`
@@ -38,7 +113,7 @@ python3 .codex/skills/obsidian-feishu-group-sender/scripts/build_feishu_send_scr
 /tmp/note-to-feishu.<unique>.send.sh
 ```
 
-## Obsidian -> Telegram 话题发送
+### Obsidian -> Telegram 话题发送
 
 - Skill 路径: `.codex/skills/obsidian-telegram-note-sender`（`.copilot` 下也有同名副本）
 - 生成脚本: `.codex/skills/obsidian-telegram-note-sender/scripts/build_telegram_send_script.py`
