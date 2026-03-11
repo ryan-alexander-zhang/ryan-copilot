@@ -14,6 +14,7 @@
 | Skill | 作用 | 路径 |
 | --- | --- | --- |
 | `alphaxiv-paper-lookup` | 通过 alphaxiv 获取 arXiv 论文的结构化 AI 摘要，避免直接读原始 PDF | `.codex/skills/alphaxiv-paper-lookup` |
+| `context-hub-doc-builder` | 从 URL、OpenAPI/Swagger 或本地文件生成可 `chub build` 的私有 Context Hub docs，并输出测试 CLI 与手动配置提示 | `.codex/skills/context-hub-doc-builder` |
 | `github-repo-capability-validator` | 对 GitHub 仓库执行 README-first 的 capability 分析、代码核验、任务拆分和报告输出 | `.codex/skills/github-repo-capability-validator` |
 | `markdownlint-cli2-validator` | 用 `markdownlint-cli2` 校验和自动修复 Markdown | `.codex/skills/markdownlint-cli2-validator` |
 | `obsidian-feishu-group-sender` | 将 Obsidian Markdown 转成 Feishu 机器人消息并生成可执行发送脚本 | `.codex/skills/obsidian-feishu-group-sender` |
@@ -71,6 +72,38 @@
 - 用户给出 arXiv 链接或 paper ID
 - 需要快速总结或解释一篇论文
 - 希望用比 PDF 更适合 LLM/agent 的结构化内容做分析
+
+### Context Hub Doc Builder
+
+- Skill 路径: `.codex/skills/context-hub-doc-builder`
+- 作用: 从 URL、OpenAPI/Swagger 或本地文件生成私有 Context Hub 文档目录，供 `chub build` 构建本地 registry
+- 生成脚本: `.codex/skills/context-hub-doc-builder/scripts/scaffold_context_hub_doc.py`
+
+适用场景：
+
+- 需要把内部 API、命令文档或本地资料转换成 `author/docs/<entry>/DOC.md`
+- 需要自动补齐 Context Hub frontmatter、`references/` 目录和测试 CLI
+- 需要给 `~/.chub/config.yaml` 生成本地 source 配置片段
+
+示例：
+
+```bash
+python3 .codex/skills/context-hub-doc-builder/scripts/scaffold_context_hub_doc.py \
+  --content-root /tmp/chub-content \
+  --author mycompany \
+  --entry-name internal-api \
+  --source-input ./openapi.yaml \
+  --description "Internal API docs" \
+  --language http \
+  --version 1.0.0 \
+  --source-trust official
+```
+
+注意：
+
+- 脚本最终输出会明确提示 `~/.chub/config.yaml` 需要手动修改
+- 如果配置里只保留本地 source，`chub search "openai"` 之类的公共内容检索会消失
+- 如果需要同时保留公共和本地内容，应继续保留 `community` source
 
 ### Markdownlint CLI2 Validator
 
