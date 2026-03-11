@@ -1,0 +1,5 @@
+interface:
+  display_name: "Context Hub Doc Builder"
+  short_description: "Generate private Context Hub docs"
+  default_prompt: "Use $context-hub-doc-builder to build a local Context Hub doc from a URL, OpenAPI spec, or file and print test CLI commands."
+
