@@ -13,7 +13,12 @@ This skill is primarily for understanding and analyzing an existing product as i
 
 Typical Chinese triggers include `分析这个产品`, `分析这个网站`, `做一个产品分析`, `做竞品分析`, `拆解这个 SaaS`, `推断技术架构`, and `根据这个 URL 做产品调研`.
 
-Read [references/report-template.md](references/report-template.md) when you need the full report structure. Read [references/diagram-templates.md](references/diagram-templates.md) when generating Mermaid diagrams.
+Read these templates when you need the full output structure:
+
+- [references/product-understanding-template.md](references/product-understanding-template.md)
+- [references/market-strategy-template.md](references/market-strategy-template.md)
+- [references/build-feasibility-cost-template.md](references/build-feasibility-cost-template.md)
+- [references/diagram-templates.md](references/diagram-templates.md)
 
 ## Inputs
 
@@ -40,6 +45,16 @@ Switch into evidence-backed cost research mode when the user asks for any of the
 - High-confidence cost analysis with precise source attribution
 
 In this mode, cost-related claims must be treated as a separate evidence-gathering task rather than lightweight commentary.
+
+## Default Deliverables
+
+By default, produce three separate reports rather than one monolithic report:
+
+1. `Product Understanding`
+2. `Market And Strategy`
+3. `Build Feasibility And Cost`
+
+All three are default outputs. Do not collapse them into one long report unless the user explicitly asks for a single-file format.
 
 ## Workflow
 
@@ -208,16 +223,16 @@ Evidence discipline for cost research:
 
 ## Output rules
 
-- Write the final report in the user's requested language.
+- Write the final reports in the user's requested language.
 - Keep section titles and diagram labels in that same language unless the user asks to preserve English technical terms.
 - Include direct source links.
 - Call out uncertainty instead of smoothing it over.
 - Explain jargon when the requested audience is non-technical.
 - Always include a standalone glossary or terminology section near the top of the report, even for non-technical audiences.
 - Keep the glossary generic to the analyzed product's domain. Do not reuse terms from previous products unless they actually apply here.
-- Keep the report centered on understanding the product as-is: what it does, who it serves, how it works, what constraints shape it, and what is likely true about its business and technical design.
-- Do not let product analysis sections drift into implementation advice, backlog design, system design prescriptions, or pseudo-PRD content.
-- Treat build-oriented content as a separate, explicitly bounded section. It should stay short unless the user explicitly asks for a builder-focused or implementation-focused analysis.
+- Keep the product-analysis reports centered on understanding the product as-is: what it does, who it serves, how it works, what constraints shape it, and what is likely true about its business and technical design.
+- Do not let product-analysis reports drift into implementation advice, backlog design, system design prescriptions, or pseudo-PRD content.
+- Keep build-oriented content in the dedicated `Build Feasibility And Cost` report.
 - Prefer analyzing realistic user alternatives over a shallow list of named competitors.
 - Include business model, competitive positioning, growth/distribution, and moat analysis when public evidence supports it.
 - Include data, security, and compliance analysis when they materially affect the product.
@@ -233,32 +248,18 @@ Evidence discipline for cost research:
 - Keep the diagram section internally ordered as: workflow, sequence, then C4.
 - Prefer fewer, tighter diagrams over speculative completeness.
 - For comparison tasks, apply the same structure to each product before comparing overlaps and differences.
+- Default to separate outputs when different chapter groups serve different decision types.
 
-## Minimum report contents
+## Minimum deliverables
 
 Include, at minimum:
 
-- Product summary
-- One-sentence product definition
-- Key terminology or glossary
-- What the product actually does
-- Target users and roles
-- Application scenarios
-- Current alternatives or substitutes
-- Implemented requirements
-- Pain points solved
-- Business model and monetization clues
-- Competitive positioning and differentiation
-- Growth or distribution clues
-- Dependencies: business, external product/infrastructure, technical
-- Key risks and constraints
-- Data, security, and compliance considerations
-- Moat and copyability
-- Likely technical solution
-- Confirmed facts vs reasoned inference
-- Build-a-similar-product notes
-- Build cost research with official URLs when cost research mode is active
-- A standalone diagram section containing workflow, sequence, and C4 diagrams
+- A `Product Understanding` report
+- A `Market And Strategy` report
+- A `Build Feasibility And Cost` report
+
+The first two are product-analysis outputs.
+The third is the build-oriented output.
 
 ## Boundary between analysis and build guidance
 
@@ -267,11 +268,11 @@ Use this distinction consistently:
 - `Product analysis`: what the product appears to do, how it is positioned, how users likely adopt it, what dependencies and risks shape it, what business and technical properties are visible from public evidence.
 - `Build guidance`: what someone should build, in what order, with which scope, modules, or implementation choices.
 
-When the user asks for general product analysis, keep the main report in `Product analysis`. Only include a short build-oriented section at the end. If the user explicitly asks for a reverse-engineering or builder-focused deliverable, you may expand the build-oriented section while still separating evidence from prescription.
+When the user asks for general product analysis, still produce all three default reports, but keep the first two as product analysis and the third as build-oriented output.
 
-In the build-oriented section, include cost considerations when relevant. Distinguish clearly between:
+In the build-oriented report, distinguish clearly between:
 
 - The analyzed product's apparent business cost structure
 - The likely build and operating costs someone would face when creating a similar product
 
-Use [references/report-template.md](references/report-template.md) when the user wants a full reusable structure.
+Use the three reference templates when the user wants full reusable structures.
