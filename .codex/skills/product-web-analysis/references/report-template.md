@@ -32,6 +32,8 @@ For each important term, explain:
 - Whether it is an industry-standard term or a product-specific term
 
 Choose only the terms necessary to understand the product. Keep this section domain-appropriate rather than reusing fixed example terms.
+This section may include both business terms and essential external proper nouns, such as important platforms, protocols, infrastructure layers, or third-party providers, when they are required for the reader to understand the rest of the report.
+Do not expand this section into a complete list of vendors or dependencies.
 
 ### 3. What the Product Actually Does
 

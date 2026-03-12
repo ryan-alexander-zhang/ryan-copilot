@@ -58,6 +58,7 @@ Work in this order:
 Do not stop at marketing copy. Explain the concrete workflow, main actors, data flow, and operating sequence.
 
 The glossary must stay product-appropriate and domain-specific without hard-coding examples from unrelated products. Define terms in plain language first, then explain what each term means in this product's context.
+The glossary may include both business terms and essential external proper nouns when they are necessary to understand the report, such as important platforms, protocols, infrastructure layers, or third-party service providers. Do not turn the glossary into a full dependency inventory.
 
 ### 4. Separate evidence from inference
 
