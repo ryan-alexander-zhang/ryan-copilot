@@ -2,6 +2,14 @@
 
 Use this template when the user asks for a detailed or reusable report.
 
+Important boundary:
+
+- Sections 1 through 11 are for analyzing the product as it exists.
+- Section 12 is the only build-oriented section by default.
+- Section 13 is the fixed diagram section.
+- Section 14 is the final summary.
+- Do not let earlier sections drift into recommendations, implementation plans, or pseudo-PRDs unless the user explicitly asks for that style of output.
+
 ## Product Analysis Report
 
 ### 1. Product Summary
@@ -115,14 +123,31 @@ Cover:
 - Suggested modules
 - Main risks
 
-### 13. Final Summary
+Keep this section clearly separate from product analysis. It should summarize implications for someone building a similar product, not rewrite the full report as implementation advice.
+
+### 13. Product Diagrams
+
+Include these in this order:
+
+- Workflow diagram
+- Sequence diagram
+- C4 diagrams
+
+Rules:
+
+- Keep all diagrams in this one section rather than scattering them across the report.
+- Label diagrams as `Confirmed`, `Mixed`, or `Inferred` when needed.
+- Keep diagrams concrete and product-specific.
+- If the public evidence is thin, simplify the diagrams instead of inventing unsupported internals.
+
+### 14. Final Summary
 
 End with a concise paragraph that states what the product is, who it serves, what core workflow it handles, and what is most likely true about its technical approach.
 
 ## Adaptation Notes
 
 - For `basic` depth, keep the glossary short but still include it as a standalone section.
-- For `basic` depth, compress sections 6 through 12.
+- For `basic` depth, compress sections 6 through 13.
 - For `expert` depth, expand sections 6 through 11 and include more explicit assumptions.
 - For beginner audiences, define jargon inline.
 - For technical audiences, add more detail on state transitions, jobs, APIs, permissions, integration boundaries, and operational risks.
