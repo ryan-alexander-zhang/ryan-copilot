@@ -1,0 +1,37 @@
+{
+  "version": "1.0.0",
+  "generated": "2026-03-11T13:12:06.848Z",
+  "docs": [
+    {
+      "id": "knative/kn-service",
+      "name": "kn-service",
+      "description": "Knative client CLI command reference for managing Knative services.",
+      "source": "official",
+      "tags": [
+        "cli",
+        "knative",
+        "service"
+      ],
+      "languages": [
+        {
+          "language": "text",
+          "versions": [
+            {
+              "version": "1.21.0",
+              "path": "knative/docs/kn-service",
+              "files": [
+                "DOC.md",
+                "references/examples.md",
+                "references/subcommands.md"
+              ],
+              "size": 2839,
+              "lastUpdated": "2026-03-11"
+            }
+          ],
+          "recommendedVersion": "1.21.0"
+        }
+      ]
+    }
+  ],
+  "skills": []
+}
