@@ -28,6 +28,19 @@ Collect these inputs from the user request or infer reasonable defaults:
 
 If the user does not specify language, answer in the language used by the user.
 
+## Cost Research Trigger
+
+Switch into evidence-backed cost research mode when the user asks for any of the following:
+
+- Whether it is worth building a similar product
+- Development, operating, or vendor cost analysis
+- API pricing, infrastructure pricing, or external dependency fees
+- Unit economics or cost structure validation
+- Official links, official pricing pages, billing pages, or legal fee pages
+- High-confidence cost analysis with precise source attribution
+
+In this mode, cost-related claims must be treated as a separate evidence-gathering task rather than lightweight commentary.
+
 ## Workflow
 
 ### 1. Normalize the target
@@ -158,6 +171,41 @@ Use Mermaid by default. Prefer:
 
 Label diagram sections as `Confirmed`, `Mixed`, or `Inferred` when needed. Use [references/diagram-templates.md](references/diagram-templates.md) for templates.
 
+### 10. Run evidence-backed cost research when triggered
+
+When cost research mode is active:
+
+1. List the major external capabilities a similar product would likely require, such as payments, KYC, model inference, OCR, messaging, storage, media processing, data providers, or sales-assisted onboarding.
+2. For each capability, determine whether the analyzed product publicly confirms a specific vendor or only implies a capability category.
+3. Search official sources first:
+   - Official pricing pages
+   - Official API pricing or usage pricing docs
+   - Official billing, limits, quota, or fee docs
+   - Official legal or fee disclosures
+   - Official sales/contact pages if pricing is not public
+4. Record the direct source URL for every non-trivial cost claim.
+5. Separate output into:
+   - `Confirmed current-product cost clues`
+   - `Confirmed vendor pricing`
+   - `Scenario-based build-cost estimates`
+6. If official pricing is unavailable, state that clearly and do not invent precise numbers.
+
+Use these evidence levels in cost research:
+
+- `High`: official page directly states the pricing, fee, or billing rule
+- `Medium`: official source supports the pricing logic, but the analyst must map it to the scenario
+- `Low`: official source confirms the cost category exists, but not enough to quantify precisely
+- `Do not quantify`: evidence is insufficient for a defensible number
+
+Evidence discipline for cost research:
+
+- Do not guess vendor pricing from memory or industry averages.
+- Do not treat a possible vendor as a confirmed vendor.
+- Do not present old or third-party pricing as current official pricing.
+- If the vendor is unconfirmed, present it only as a candidate option in the build-cost model.
+- If the evidence is too thin, mark the item as `Do not quantify`.
+- Prefer saying `candidate build option` or `confirmed dependency` over collapsing both into one label.
+
 ## Output rules
 
 - Write the final report in the user's requested language.
@@ -173,6 +221,14 @@ Label diagram sections as `Confirmed`, `Mixed`, or `Inferred` when needed. Use [
 - Prefer analyzing realistic user alternatives over a shallow list of named competitors.
 - Include business model, competitive positioning, growth/distribution, and moat analysis when public evidence supports it.
 - Include data, security, and compliance analysis when they materially affect the product.
+- In cost research mode, every non-trivial cost claim must include a direct official source URL whenever one exists.
+- In cost research mode, distinguish:
+  - the analyzed product's apparent business cost structure
+  - official third-party pricing facts
+  - build-cost estimates based on explicit assumptions
+- If official pricing is unavailable, say so clearly instead of inferring a precise number.
+- In cost research mode, use the evidence levels `High`, `Medium`, `Low`, and `Do not quantify` consistently.
+- In cost research mode, if a cost item lacks a defensible number, output the item, source, and uncertainty anyway instead of omitting it.
 - Always include a standalone diagram section unless the user explicitly opts out.
 - Keep the diagram section internally ordered as: workflow, sequence, then C4.
 - Prefer fewer, tighter diagrams over speculative completeness.
@@ -201,6 +257,7 @@ Include, at minimum:
 - Likely technical solution
 - Confirmed facts vs reasoned inference
 - Build-a-similar-product notes
+- Build cost research with official URLs when cost research mode is active
 - A standalone diagram section containing workflow, sequence, and C4 diagrams
 
 ## Boundary between analysis and build guidance

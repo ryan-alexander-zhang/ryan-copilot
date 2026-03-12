@@ -4,10 +4,11 @@ Use this template when the user asks for a detailed or reusable report.
 
 Important boundary:
 
-- Sections 1 through 17 are for analyzing the product as it exists.
-- Section 18 is the only build-oriented section by default.
-- Section 19 is the fixed diagram section.
-- Section 20 is the final summary.
+- Sections 1 through 18 are for analyzing the product as it exists.
+- Section 19 is the main build-oriented section by default.
+- Section 20 is the evidence-backed build cost research section when cost analysis is requested.
+- Section 21 is the fixed diagram section.
+- Section 22 is the final summary.
 - Do not let earlier sections drift into recommendations, implementation plans, or pseudo-PRDs unless the user explicitly asks for that style of output.
 
 ## Product Analysis Report
@@ -197,7 +198,45 @@ For cost considerations, include only the cost categories that materially matter
 - Sales, onboarding, or customer acquisition cost
 - Compliance, legal, or security cost
 
-### 20. Product Diagrams
+### 20. Build Cost Research
+
+Include this section when the user asks for accurate build-cost analysis, API pricing, vendor pricing, unit economics validation, or official source-backed cost estimates.
+
+Split the section into:
+
+- Confirmed current-product cost clues
+- Confirmed vendor pricing
+- Scenario-based build-cost estimates
+
+Use these evidence levels:
+
+- `High`: official source directly states the price, fee, or billing rule
+- `Medium`: official source supports the pricing logic, but scenario mapping still requires analyst judgment
+- `Low`: official source confirms the cost category exists, but does not support precise quantification
+- `Do not quantify`: the item should be listed, but no defensible number should be given
+
+For every important cost item, include:
+
+- Cost item
+- Vendor or cost type
+- Whether the vendor is confirmed or only a candidate
+- Official source
+- Official URL
+- Public pricing rule, fee rule, or billing rule
+- Billing unit
+- Evidence level: `High`, `Medium`, `Low`, or `Do not quantify`
+- Key uncertainty or assumption
+
+Rules:
+
+- Use official pricing, billing, fee, limits, quota, or legal pages whenever available.
+- If pricing is not public, say `Contact sales / not publicly listed` rather than inventing a precise number.
+- If the analyzed product does not confirm the vendor, do not present that vendor's pricing as the product's actual cost.
+- Keep `Confirmed vendor pricing` separate from `Scenario-based build-cost estimates`.
+- If evidence is too thin, keep the row and mark it `Do not quantify` rather than dropping the item.
+- Prefer labels such as `confirmed dependency`, `confirmed vendor`, or `candidate build option` over vague vendor-status wording.
+
+### 21. Product Diagrams
 
 Include these in this order:
 
@@ -212,14 +251,14 @@ Rules:
 - Keep diagrams concrete and product-specific.
 - If the public evidence is thin, simplify the diagrams instead of inventing unsupported internals.
 
-### 21. Final Summary
+### 22. Final Summary
 
 End with a concise paragraph that states what the product is, who it serves, what core workflow it handles, and what is most likely true about its technical approach.
 
 ## Adaptation Notes
 
 - For `basic` depth, keep the glossary short but still include it as a standalone section.
-- For `basic` depth, compress sections 6 through 20.
-- For `expert` depth, expand sections 6 through 18 and include more explicit assumptions.
+- For `basic` depth, compress sections 6 through 21.
+- For `expert` depth, expand sections 6 through 20 and include more explicit assumptions.
 - For beginner audiences, define jargon inline.
 - For technical audiences, add more detail on state transitions, jobs, APIs, permissions, integration boundaries, and operational risks.
