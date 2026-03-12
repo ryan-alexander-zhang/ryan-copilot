@@ -49,10 +49,10 @@ Work in this order:
 
 1. Identify product category and target users.
 2. Build a product-specific glossary of the key domain terms needed to understand the product.
-3. Extract positioning from the site's own language.
+3. Extract positioning from the site's own language and compress it into a one-sentence product definition.
 4. Reconstruct the real workflow the product supports or replaces.
-5. Identify application scenarios and operating context.
-6. Derive requirements, pain points, dependencies, and likely business constraints.
+5. Identify application scenarios, operating context, and the current alternatives users would realistically use instead.
+6. Derive requirements, pain points, dependencies, business model clues, distribution clues, and likely business constraints.
 7. Infer the likely technical solution only after the business workflow is clear.
 
 Do not stop at marketing copy. Explain the concrete workflow, main actors, data flow, and operating sequence.
@@ -103,7 +103,30 @@ Good categories to consider include:
 
 Choose only the categories that are relevant to the product. Do not force a generic checklist if the evidence does not support it.
 
-### 7. Produce diagrams
+### 7. Analyze business model, competition, and moat
+
+Include bounded analysis of the product's business position where public evidence allows. Good questions include:
+
+- Who appears to pay
+- What value the user is likely paying for
+- What the realistic substitutes or alternatives are
+- Where the product appears differentiated
+- What growth or distribution mechanisms are visible
+- What might count as a moat, and what appears easy to copy
+
+Keep this analytical rather than advisory. Describe what appears true about the product; do not turn it into startup strategy unless the user explicitly asks for that.
+
+### 8. Analyze data, security, and compliance posture
+
+When relevant, include a standalone section covering:
+
+- What kinds of data the product likely handles
+- What permission or tenancy boundaries likely matter
+- What security, privacy, or compliance expectations shape the product
+
+This section is especially important for B2B software, AI products, fintech, health, legal, and workflow systems that touch sensitive data.
+
+### 9. Produce diagrams
 
 Unless the user explicitly opts out, include:
 
@@ -147,6 +170,9 @@ Label diagram sections as `Confirmed`, `Mixed`, or `Inferred` when needed. Use [
 - Keep the report centered on understanding the product as-is: what it does, who it serves, how it works, what constraints shape it, and what is likely true about its business and technical design.
 - Do not let product analysis sections drift into implementation advice, backlog design, system design prescriptions, or pseudo-PRD content.
 - Treat build-oriented content as a separate, explicitly bounded section. It should stay short unless the user explicitly asks for a builder-focused or implementation-focused analysis.
+- Prefer analyzing realistic user alternatives over a shallow list of named competitors.
+- Include business model, competitive positioning, growth/distribution, and moat analysis when public evidence supports it.
+- Include data, security, and compliance analysis when they materially affect the product.
 - Always include a standalone diagram section unless the user explicitly opts out.
 - Keep the diagram section internally ordered as: workflow, sequence, then C4.
 - Prefer fewer, tighter diagrams over speculative completeness.
@@ -157,14 +183,21 @@ Label diagram sections as `Confirmed`, `Mixed`, or `Inferred` when needed. Use [
 Include, at minimum:
 
 - Product summary
+- One-sentence product definition
 - Key terminology or glossary
 - What the product actually does
 - Target users and roles
 - Application scenarios
+- Current alternatives or substitutes
 - Implemented requirements
 - Pain points solved
+- Business model and monetization clues
+- Competitive positioning and differentiation
+- Growth or distribution clues
 - Dependencies: business, external product/infrastructure, technical
 - Key risks and constraints
+- Data, security, and compliance considerations
+- Moat and copyability
 - Likely technical solution
 - Confirmed facts vs reasoned inference
 - Build-a-similar-product notes
@@ -178,5 +211,10 @@ Use this distinction consistently:
 - `Build guidance`: what someone should build, in what order, with which scope, modules, or implementation choices.
 
 When the user asks for general product analysis, keep the main report in `Product analysis`. Only include a short build-oriented section at the end. If the user explicitly asks for a reverse-engineering or builder-focused deliverable, you may expand the build-oriented section while still separating evidence from prescription.
+
+In the build-oriented section, include cost considerations when relevant. Distinguish clearly between:
+
+- The analyzed product's apparent business cost structure
+- The likely build and operating costs someone would face when creating a similar product
 
 Use [references/report-template.md](references/report-template.md) when the user wants a full reusable structure.
