@@ -14,20 +14,30 @@ Use this template when the user asks for a detailed or reusable report.
 - Core value proposition
 - Analysis confidence
 
-### 2. What the Product Actually Does
+### 2. Key Terminology
+
+For each important term, explain:
+
+- Term
+- Plain-language meaning
+- What it means in this product's context
+- Whether it is an industry-standard term or a product-specific term
+
+Choose only the terms necessary to understand the product. Keep this section domain-appropriate rather than reusing fixed example terms.
+
+### 3. What the Product Actually Does
 
 - Plain-language explanation
 - Core workflow in ordered steps
 - Main actors and roles
 
-### 3. Target Users and Roles
+### 4. Target Users and Roles
 
 - Buyer
 - Operator
 - End beneficiary
-- Important business terms explained if needed
 
-### 4. Application Scenarios
+### 5. Application Scenarios
 
 For each scenario, explain:
 
@@ -36,7 +46,7 @@ For each scenario, explain:
 - What problem it solves
 - Why the product fits that scenario
 
-### 5. Implemented Requirements
+### 6. Implemented Requirements
 
 Split requirements into:
 
@@ -45,7 +55,7 @@ Split requirements into:
 - Operational requirements
 - Risk or compliance requirements
 
-### 6. Pain Points Solved
+### 7. Pain Points Solved
 
 Explain:
 
@@ -54,7 +64,7 @@ Explain:
 - What the product removes or improves
 - What new value it creates
 
-### 7. Dependencies
+### 8. Dependencies
 
 Split dependencies into:
 
@@ -62,7 +72,24 @@ Split dependencies into:
 - External integrations or infrastructure dependencies
 - Internal technical dependencies
 
-### 8. Likely Technical Solution
+### 9. Key Risks and Constraints
+
+Cover only the risk categories that materially apply to the product:
+
+- Business or market risks
+- Operational risks
+- Technical risks
+- Compliance or legal risks
+- Platform or ecosystem dependency risks
+- Go-to-market risks
+
+For each important risk, explain:
+
+- What the risk is
+- Why it matters for this product
+- Whether it appears to be core, moderate, or secondary
+
+### 10. Likely Technical Solution
 
 Cover:
 
@@ -71,7 +98,7 @@ Cover:
 - Likely data and workflow design
 - Key technical challenges
 
-### 9. Confirmed Facts vs Reasoned Inference
+### 11. Confirmed Facts vs Reasoned Inference
 
 Split into:
 
@@ -80,7 +107,7 @@ Split into:
 
 Add confidence labels where helpful.
 
-### 10. If Building a Similar Product
+### 12. If Building a Similar Product
 
 Cover:
 
@@ -88,13 +115,14 @@ Cover:
 - Suggested modules
 - Main risks
 
-### 11. Final Summary
+### 13. Final Summary
 
 End with a concise paragraph that states what the product is, who it serves, what core workflow it handles, and what is most likely true about its technical approach.
 
 ## Adaptation Notes
 
-- For `basic` depth, compress sections 5 through 10.
-- For `expert` depth, expand sections 5 through 9 and include more explicit assumptions.
+- For `basic` depth, keep the glossary short but still include it as a standalone section.
+- For `basic` depth, compress sections 6 through 12.
+- For `expert` depth, expand sections 6 through 11 and include more explicit assumptions.
 - For beginner audiences, define jargon inline.
 - For technical audiences, add more detail on state transitions, jobs, APIs, permissions, integration boundaries, and operational risks.

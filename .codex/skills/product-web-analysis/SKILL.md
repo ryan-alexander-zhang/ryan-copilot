@@ -46,13 +46,16 @@ If the user does not specify language, answer in the language used by the user.
 Work in this order:
 
 1. Identify product category and target users.
-2. Extract positioning from the site's own language.
-3. Reconstruct the real workflow the product supports or replaces.
-4. Identify application scenarios and operating context.
-5. Derive requirements, pain points, dependencies, and likely business constraints.
-6. Infer the likely technical solution only after the business workflow is clear.
+2. Build a product-specific glossary of the key domain terms needed to understand the product.
+3. Extract positioning from the site's own language.
+4. Reconstruct the real workflow the product supports or replaces.
+5. Identify application scenarios and operating context.
+6. Derive requirements, pain points, dependencies, and likely business constraints.
+7. Infer the likely technical solution only after the business workflow is clear.
 
 Do not stop at marketing copy. Explain the concrete workflow, main actors, data flow, and operating sequence.
+
+The glossary must stay product-appropriate and domain-specific without hard-coding examples from unrelated products. Define terms in plain language first, then explain what each term means in this product's context.
 
 ### 4. Separate evidence from inference
 
@@ -82,7 +85,22 @@ Infer likely modules, data flows, and architecture patterns only to the degree j
 
 State implementation uncertainty explicitly. Treat diagrams as inferred unless the public sources clearly document the architecture.
 
-### 6. Produce diagrams
+### 6. Analyze product risks and constraints
+
+Include a standalone section on the main risks and constraints involved in operating or building the product. Focus on the risks that materially affect viability, defensibility, implementation complexity, or go-to-market execution.
+
+Good categories to consider include:
+
+- Business or market risk
+- Operational risk
+- Technical risk
+- Compliance or legal risk
+- Platform or ecosystem dependency risk
+- Go-to-market risk
+
+Choose only the categories that are relevant to the product. Do not force a generic checklist if the evidence does not support it.
+
+### 7. Produce diagrams
 
 Unless the user explicitly opts out, include:
 
@@ -105,6 +123,8 @@ Label diagram sections as `Confirmed`, `Mixed`, or `Inferred` when needed. Use [
 - Include direct source links.
 - Call out uncertainty instead of smoothing it over.
 - Explain jargon when the requested audience is non-technical.
+- Always include a standalone glossary or terminology section near the top of the report, even for non-technical audiences.
+- Keep the glossary generic to the analyzed product's domain. Do not reuse terms from previous products unless they actually apply here.
 - For comparison tasks, apply the same structure to each product before comparing overlaps and differences.
 
 ## Minimum report contents
@@ -112,12 +132,14 @@ Label diagram sections as `Confirmed`, `Mixed`, or `Inferred` when needed. Use [
 Include, at minimum:
 
 - Product summary
+- Key terminology or glossary
 - What the product actually does
 - Target users and roles
 - Application scenarios
 - Implemented requirements
 - Pain points solved
 - Dependencies: business, external product/infrastructure, technical
+- Key risks and constraints
 - Likely technical solution
 - Confirmed facts vs reasoned inference
 - Build-a-similar-product notes
