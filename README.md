@@ -129,6 +129,13 @@ python3 \
 - Skill 路径: `.codex/skills/product-web-analysis`
 - 作用: 基于产品名称或 URL，用公开网页和官方资料做证据化产品分析，并区分 `Confirmed facts` 与 `Reasoned inference`
 
+最小输入：
+
+- 产品名或产品 URL
+- 可选：输出语言
+- 可选：对比对象
+- 可选：是否合并为单文件输出
+
 默认输出：
 
 - `Product Understanding`
@@ -151,6 +158,14 @@ python3 \
 - 做竞品分析、产品拆解、技术架构推断
 - 评估一个类似产品是否值得做、MVP 怎么切、主要成本和依赖是什么
 - 输出带 Mermaid 图、来源链接和不确定性标注的结构化报告
+
+默认内置规则：
+
+- 默认输出三份报告，不要求用户选择 analysis objective
+- 默认开启证据型成本调研
+- 默认开启 Mermaid 图
+- 默认区分 `Confirmed facts` 和 `Reasoned inference`
+- 默认将不确定项标注为“推测”或“待验证项”
 
 ## Obsidian Sender Skills
 

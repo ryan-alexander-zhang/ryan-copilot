@@ -1,20 +1,39 @@
 ---
 name: product-web-analysis
-description: Analyze a product from a user-provided product name or URL using web search and official public sources, then produce structured reports in the user's requested language. Use when Codex needs product analysis, website analysis, product research, competitor analysis, product teardown, reverse analysis of a SaaS or tool, or an MVP build assessment for a similar product, including scope, dependencies, compliance, cost, and technical architecture suggestions. Trigger on requests such as analyze this product, analyze this website, explain this product, summarize this SaaS, infer the architecture, compare these products, assess whether it is worth building, estimate MVP cost or feasibility, or Chinese requests like 分析这个产品、分析这个网站、产品分析、竞品分析、产品拆解、技术架构推断、产品调研、逆向分析这个产品、根据产品名称或URL生成报告、评估能不能做、做MVP拆解、估算开发成本. Generate reports with flowcharts, sequence diagrams, and C4 diagrams while clearly separating confirmed facts from reasoned inference.
+description: >-
+  Analyze a product from a user-provided product name or URL using web
+  search and official public sources, then produce three structured
+  reports in the user's requested language: Product Understanding,
+  Market And Strategy, and Build MVP. Use when Codex needs product
+  analysis, website analysis, product research, competitor analysis,
+  product teardown, reverse analysis of a SaaS or tool, or an MVP build
+  assessment for a similar product, including scope, dependencies,
+  compliance, cost, and technical architecture suggestions. Trigger on
+  requests such as analyze this product, analyze this website, explain
+  this product, summarize this SaaS, infer the architecture, compare
+  these products, assess whether it is worth building, estimate MVP cost
+  or feasibility, or Chinese requests like 分析这个产品、分析这个网站、产品分析、竞品分析、产品拆解、技术架构推断、产品调研、逆向分析这个产品、根据产品名称或URL生成报告、评估能不能做、做MVP拆解、估算开发成本.
+  Generate reports with flowcharts, sequence diagrams, and C4 diagrams
+  while clearly separating confirmed facts from reasoned inference.
 ---
 
 # Product Web Analysis
 
 ## Overview
 
-Use this skill to research a public product on the web and turn scattered evidence into a structured report. Accept either a product name or a product URL, adapt the report language to the user's request, and keep a hard boundary between confirmed facts and inference.
+Use this skill to research a public product on the web and turn
+scattered evidence into three structured reports. Accept either a
+product name or a product URL, adapt the report language to the user's
+request, and keep a hard boundary between confirmed facts and
+inference.
 
 This skill is primarily for understanding and analyzing an existing
 product as it appears in public. The first two reports stay analytical.
 The third report is the only build-oriented output and should stay
 focused on an early MVP rather than a full PRD.
 
-Typical Chinese triggers include `分析这个产品`, `分析这个网站`, `做一个产品分析`, `做竞品分析`, `拆解这个 SaaS`, `推断技术架构`, and `根据这个 URL 做产品调研`.
+Typical Chinese triggers include `分析这个产品`, `分析这个网站`, `做一个产品分析`,
+`做竞品分析`, `拆解这个 SaaS`, `推断技术架构`, and `根据这个 URL 做产品调研`.
 
 Read these templates when you need the full output structure:
 
@@ -23,22 +42,57 @@ Read these templates when you need the full output structure:
 - [references/build-mvp-template.md](references/build-mvp-template.md)
 - [references/diagram-templates.md](references/diagram-templates.md)
 
-## Inputs
+## Minimal Inputs
 
-Collect these inputs from the user request or infer reasonable defaults:
+This skill should normally be called with only the smallest necessary
+inputs. Do not expose a large parameter surface unless the user clearly
+needs it.
+
+Required:
 
 - Product identifier: product name, URL, or both
-- Analysis objective: general analysis, competitor comparison, architecture inference, PRD-style decomposition, investor-style summary, and so on
+
+Optional:
+
 - Preferred language for the final report
-- Depth: `basic`, `detailed`, or `expert`
-- Audience: `beginner`, `pm`, `founder`, `engineer`, `architect`, or `investor`
-- Whether to compare multiple products
+- Comparison targets when the user explicitly wants competitor comparison
+- Output format override when the user explicitly wants a single-file
+  report instead of the default three-report output
 
 If the user does not specify language, answer in the language used by the user.
 
-## Cost Research Trigger
+Do not ask the user to choose an analysis objective, audience, evidence
+mode, diagram mode, or terminology mode. Those are internal defaults.
 
-Switch into evidence-backed cost research mode when the user asks for any of the following:
+## Internal Defaults
+
+Unless the user explicitly overrides them, use these defaults:
+
+- Deliverables: always produce `Product Understanding`, `Market And
+  Strategy`, and `Build MVP`
+- Output format: three separate reports
+- Source policy: official sources first, third-party sources only to fill
+  gaps or corroborate
+- Cost research: enabled by default for the `Build MVP` report
+- Diagrams: enabled by default
+- Evidence model: always separate `Confirmed facts` from `Reasoned
+  inference`
+- Uncertainty labels: always mark uncertain items as `推测` or `待验证项`
+  in Chinese, or equivalent labels in the output language
+- Writing stance: neutral, analytical, and fact-first rather than tuned
+  to a role-based audience
+- Depth: default to a solid `detailed` level; only compress or expand if
+  the user explicitly asks for a shorter or deeper version
+- English technical terms: preserve when they improve precision; do not
+  expose this as a user-facing parameter
+
+## Cost Research Default
+
+Evidence-backed cost research is on by default for the `Build MVP`
+report.
+
+Strengthen the cost-research pass when the user asks for any of the
+following:
 
 - Whether it is worth building a similar product
 - Development, operating, or vendor cost analysis
@@ -47,17 +101,20 @@ Switch into evidence-backed cost research mode when the user asks for any of the
 - Official links, official pricing pages, billing pages, or legal fee pages
 - High-confidence cost analysis with precise source attribution
 
-In this mode, cost-related claims must be treated as a separate evidence-gathering task rather than lightweight commentary.
+In this mode, cost-related claims must be treated as a separate
+evidence-gathering task rather than lightweight commentary.
 
 ## Default Deliverables
 
-By default, produce three separate reports rather than one monolithic report:
+By default, produce three separate reports rather than one monolithic
+report:
 
 1. `Product Understanding`
 2. `Market And Strategy`
 3. `Build MVP`
 
-All three are default outputs. Do not collapse them into one long report unless the user explicitly asks for a single-file format.
+All three are default outputs. Do not collapse them into one long report
+unless the user explicitly asks for a single-file format.
 
 ## Build MVP Deliverable
 
