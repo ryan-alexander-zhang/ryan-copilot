@@ -1,0 +1,4 @@
+interface:
+  display_name: "Refactoring Playbook"
+  short_description: "Diagnose code smells and guide safe refactors."
+  default_prompt: "Use $refactoring-playbook to inspect this code, identify bad smells, choose behavior-preserving refactorings, and implement the changes."
