@@ -129,38 +129,87 @@ Use `Low`, `Medium`, or `High` for risk level.
 
 ### 5. Dependency Research And Interface Inventory
 
-List only the external interfaces or capabilities required by the MVP
-core flow.
+Do not make this section brief. Expand it into a detailed interface
+inventory that covers all external interfaces required by the MVP core
+flow and the internal module boundaries needed to support that flow.
 
-For each dependency, include:
+Produce this section in two views:
 
-- Interface name
+1. `Flow view`
+2. `Module view`
+
+For the `Flow view`, group interfaces by concrete workflow stages such
+as:
+
+- Agency or business onboarding
+- Creator or end-user onboarding
+- KYC / KYB / verification
+- Bank linking or account verification
+- Funding source activation
+- Authorization or mandate setup
+- Debit or collection
+- Payout or disbursement
+- Reconciliation and event handling
+- Notifications and messaging
+- Invoicing or billing
+- Cross-border or optional regional flows
+
+For the `Module view`, group interfaces by internal product or system
+modules such as:
+
+- Identity and tenant management
+- Split configuration or billing rules
+- Ledger and transaction state
+- Workflow orchestration
+- Payments and payout orchestration
+- Notifications
+- Reporting and exports
+- Compliance and risk controls
+- Support or ops console
+
+For every external interface, include:
+
+- Vendor
+- Product or API family
+- Exact endpoint name, operation name, or the narrowest official guide
 - Purpose
-- Call timing
-- Key parameters
-- Return result or webhook result
+- When it is called in the workflow
+- Key inputs
+- Key outputs or webhook callbacks
+- Whether it is synchronous, asynchronous, or both
 - Integration difficulty
 - Backup option
-- Whether it is confirmed or `推测`
+- Whether it is a confirmed dependency, candidate build option, or
+  `推测`
+- Official documentation URL
+- Documentation freshness note, such as `URL verified on YYYY-MM-DD`
 
-Recommended fields per dependency:
+For every internal interface or module boundary, include:
 
-- `Interface or capability`
-- `Purpose`
-- `When called`
-- `Key params`
-- `Return or callback result`
-- `Integration difficulty`
-- `Backup option`
-- `Status`
+- Module name
+- Internal API, command, event, or job boundary
+- Upstream trigger
+- Downstream dependency
+- Why it is required for the MVP
+- Whether it is public, internal-only, or admin-only
 
 Rules:
 
 - Prefer official APIs and documented integration points.
+- Use web search to verify official documentation URLs on the analysis
+  date.
+- Prefer endpoint-level or guide-level official docs over generic vendor
+  homepages.
 - If exact interfaces are not public, infer from common industry
   practice and label the item as `推测`.
+- If no public docs exist for a confirmed integration, say `No public
+  API docs found as of YYYY-MM-DD` instead of pretending the docs are
+  public.
 - Separate must-have interfaces from deferrable interfaces when that
   makes the tradeoff clearer.
+- If versioning or changelog pages materially affect freshness, cite
+  them alongside the interface docs or mention them in the freshness
+  note.
 
 ### 6. Cost Analysis
 

@@ -58,6 +58,8 @@ Optional:
 - Comparison targets when the user explicitly wants competitor comparison
 - Output format override when the user explicitly wants a single-file
   report instead of the default three-report output
+- Output path override when the user explicitly wants a different
+  directory; otherwise use the default file output path described below
 
 If the user does not specify language, answer in the language used by the user.
 
@@ -71,6 +73,13 @@ Unless the user explicitly overrides them, use these defaults:
 - Deliverables: always produce `Product Understanding`, `Market And
   Strategy`, and `Build MVP`
 - Output format: three separate reports
+- File output: mandatory
+- Default output directory: relative to the current working directory,
+  `reports/{project-name}/`
+- Default report filenames:
+  - `01-product-understanding.md`
+  - `02-market-and-strategy.md`
+  - `03-build-mvp.md`
 - Source policy: official sources first, third-party sources only to fill
   gaps or corroborate
 - Cost research: enabled by default for the `Build MVP` report
@@ -85,6 +94,26 @@ Unless the user explicitly overrides them, use these defaults:
   the user explicitly asks for a shorter or deeper version
 - English technical terms: preserve when they improve precision; do not
   expose this as a user-facing parameter
+
+`{project-name}` normalization rules:
+
+- Prefer the confirmed official product name from the analyzed site.
+- Convert the name to a filesystem-safe slug suitable for a directory
+  name.
+- If the official name cannot be confirmed, derive the slug from the
+  provided domain or product identifier.
+- Do not ask the user to choose a directory name unless ambiguity blocks
+  reasonable normalization.
+
+Mandatory file-output rule:
+
+- Writing the deliverables to files is required, not optional.
+- Do not treat chat-only output as sufficient completion.
+- Even when summarizing results in chat, write the report files first and
+  then reference their paths in the response.
+- If the user explicitly asks for a single-file report, still write it to
+  disk under `reports/{project-name}/`, using a single Markdown file
+  instead of the three default files.
 
 ## Cost Research Default
 
@@ -116,6 +145,14 @@ report:
 All three are default outputs. Do not collapse them into one long report
 unless the user explicitly asks for a single-file format.
 
+Default file layout:
+
+- `reports/{project-name}/01-product-understanding.md`
+- `reports/{project-name}/02-market-and-strategy.md`
+- `reports/{project-name}/03-build-mvp.md`
+
+These files are mandatory deliverables by default.
+
 ## Build MVP Deliverable
 
 Use [references/build-mvp-template.md](references/build-mvp-template.md)
@@ -140,6 +177,32 @@ By default, organize the `Build MVP` report into these seven sections:
 Keep this report simple, staged, and actionable. Avoid turning it into a
 full backlog or enterprise target-state architecture.
 
+Special requirement for section 5:
+
+- Do not stop at a short or generic bullet list.
+- Expand `Dependency research and interface inventory` into a detailed
+  inventory organized in at least two views:
+  1. end-to-end flow view
+  2. module view
+- In the flow view, group interfaces by concrete workflow stages such as
+  onboarding, KYC, bank linking, authorization, debit, payout,
+  reconciliation, notifications, invoicing, and cross-border handling
+  when relevant.
+- In the module view, group interfaces by product or system modules such
+  as identity, tenant management, split rules, ledger, workflow,
+  reporting, notifications, compliance, and ops tooling.
+- For every external interface, include the exact vendor, product or API
+  family, specific endpoint or narrowest official guide, call timing,
+  key inputs, key outputs or webhook callbacks, backup option, and
+  whether the dependency is confirmed or inferred.
+- Verify documentation URLs with live web search on the analysis date.
+  Prefer endpoint-level or guide-level official docs over generic
+  homepages.
+- When a vendor publishes versioning or changelog docs that materially
+  affect interface freshness, include them or cite them in that section.
+- If no public API docs exist, state that explicitly as of the analysis
+  date instead of pretending the interface is documented.
+
 ## Workflow
 
 ### 1. Normalize the target
@@ -147,6 +210,9 @@ full backlog or enterprise target-state architecture.
 - If the user gives a URL, open that site first and confirm the product name.
 - If the user gives only a product name, use web search to identify the official site before deeper analysis.
 - If multiple products share the same name, disambiguate by company, domain, tagline, or URL before continuing.
+- Normalize the output directory name from the confirmed product name and
+  prepare `reports/{project-name}/` in the current working directory
+  unless the user explicitly requested a different location.
 
 ### 2. Gather evidence with web search
 
@@ -154,6 +220,9 @@ full backlog or enterprise target-state architecture.
 - Prioritize official sources first: homepage, product pages, docs, help center, pricing, changelog, blog, terms, privacy, trust/compliance pages.
 - Use third-party sources only to fill gaps or corroborate unclear claims.
 - Keep source URLs for every major conclusion.
+- For `Build MVP` section 5, run a dedicated documentation pass using web
+  search to verify current official API or integration docs for each
+  major external interface included in the MVP flow.
 
 ### 3. Reconstruct the product from business reality
 
@@ -308,9 +377,24 @@ Evidence discipline for cost research:
 - If the evidence is too thin, mark the item as `Do not quantify`.
 - Prefer saying `candidate build option` or `confirmed dependency` over collapsing both into one label.
 
+### 11. Write the reports to files
+
+- Writing files is mandatory for this skill.
+- By default, write three Markdown files under
+  `reports/{project-name}/`:
+  - `01-product-understanding.md`
+  - `02-market-and-strategy.md`
+  - `03-build-mvp.md`
+- If the user explicitly requested a single-file output, still write it
+  under `reports/{project-name}/` as one Markdown file.
+- After writing the files, return a concise chat response that points to
+  the generated file paths and optionally summarizes the key findings.
+
 ## Output rules
 
 - Write the final reports in the user's requested language.
+- Always write the final reports to local Markdown files before sending
+  the chat response.
 - Keep section titles and diagram labels in that same language unless the user asks to preserve English technical terms.
 - Include direct source links.
 - Call out uncertainty instead of smoothing it over.
@@ -326,6 +410,10 @@ Evidence discipline for cost research:
   regulation, what qualifications or licenses may be needed, which items
   can be covered by third parties, which interfaces are required by the
   MVP flow, and why the recommended architecture fits an early MVP.
+- In the `Build MVP` report, make the `Dependency research and interface
+  inventory` section detailed rather than brief, and include concrete
+  official documentation URLs for each major external interface verified
+  via web search on the analysis date.
 - If compliance, licensing, dependency, or vendor details cannot be
   confirmed, label them as `推测` or `待验证项` when writing in Chinese, or
   use an equivalent localized uncertainty label in other languages.
@@ -345,6 +433,12 @@ Evidence discipline for cost research:
 - Prefer fewer, tighter diagrams over speculative completeness.
 - For comparison tasks, apply the same structure to each product before comparing overlaps and differences.
 - Default to separate outputs when different chapter groups serve different decision types.
+- In the default case, the required file outputs are:
+  - `reports/{project-name}/01-product-understanding.md`
+  - `reports/{project-name}/02-market-and-strategy.md`
+  - `reports/{project-name}/03-build-mvp.md`
+- In the final chat response, include the written file paths rather than
+  only pasting the full report into chat.
 
 ## Minimum deliverables
 
