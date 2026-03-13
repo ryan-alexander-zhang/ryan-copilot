@@ -14,7 +14,7 @@
 - `Creator`：接受邀请、连接银行账户、接收平台收入、被自动扣款或通过账单链接付款。
 - `Referral / Chat Team / Additional Participant`：接收 agency 二次分账。
 - `上游平台`：OnlyFans、Chaturbate 等，为 creator 提供原始收入来源。
-- `支付合作方`：Plaid 负责银行连接；Dwolla 负责账户/ACH 能力；Wise 支持部分跨境 USD 银行路径。
+- `支付合作方`：Stripe 负责 agency 侧 KYC、税务信息与 1099 交付；Plaid 负责 creator 银行连接；Dwolla 负责 ACH / funding source；Wise 支持部分跨境 USD 银行路径。
 - `Melon`：负责规则、检测、编排、通知、账本与 payout。
 
 # 应用场景
@@ -32,6 +32,7 @@
   - Creator 银行账户：Melon 依赖银行入账事件触发分账。
   - Invoice 数据源：Automated Invoicing 依赖 FansMetric。
 - `中游关键依赖`
+  - Stripe：agency 侧 KYC、tax reporting、tax form delivery。
   - Plaid：银行连接与账户验证。
   - Dwolla：支付账户、funding source、ACH 转账。
   - Wise：国际 agency / 加拿大 creator 的 USD 银行账户路径。
@@ -44,17 +45,19 @@
 
 ```mermaid
 flowchart LR
-  A[Agency 注册并创建 Split] --> B[Creator 接受邀请并绑定银行]
-  B --> C[OnlyFans / Chaturbate 向 Creator 打款]
-  C --> D[Melon 检测入账并计算 Agency 应收]
-  D --> E[通过支付合作方发起 ACH 扣款]
-  E --> F[ACH 清算约 4 个工作日]
-  F --> G[Melon 按周向 Agency payout]
-  G --> H[可选: 向 Referral / Chat Team 二次分账]
-  A --> I[可选: 启用 Invoice Split]
-  I --> J[基于 FansMetric 生成账单]
-  J --> K[通过短信 / 邮件发送支付链接]
-  K --> L[Creator 直接付款]
+  A[Agency 注册] --> B[通过 Stripe 完成 KYC / Tax Onboarding]
+  B --> C[Agency 创建 Split]
+  C --> D[Creator 接受邀请并通过 Plaid 绑定银行]
+  D --> E[OnlyFans / Chaturbate 向 Creator 打款]
+  E --> F[Melon 检测入账并计算 Agency 应收]
+  F --> G[通过 Dwolla / 支付合作方发起 ACH 扣款]
+  G --> H[ACH 清算约 4 个工作日]
+  H --> I[Melon 按周向 Agency payout]
+  I --> J[可选: 向 Referral / Chat Team 二次分账]
+  C --> K[可选: 启用 Invoice Split]
+  K --> L[基于 FansMetric 生成账单]
+  L --> M[通过短信 / 邮件发送支付链接]
+  M --> N[Creator 直接付款]
 ```
 
 # 用户旅程
@@ -62,6 +65,7 @@ flowchart LR
 ## Agency Onboard
 
 - Agency 注册 Melon，提交实体资料并完成基础 KYC / KYB。
+- 公开文档显示，agency 端的 KYC / tax reporting 与 Stripe 有明确关联；共享页面中的补充截图也显示会跳转到 `connect.stripe.com/setup/`，说明这一环节大概率采用 Stripe-hosted onboarding。
 - 配置自己的收款账户与 payout 路径。
 - 如果是国际 agency，则需要额外准备 Wise USD 账户。
 - Onboard 完成后进入 dashboard，可创建 split、查看 cashout / payout 历史并导出数据。
@@ -98,6 +102,7 @@ flowchart LR
 - 如果 creator 银行连接失效，Melon 会要求 creator 重新连接银行账户，split 可能暂时进入 pending。
 - 如果账户余额不足、ACH 失败或发生退票，相关交易不会进入正常 payout，而会转入异常处理与重试流程。
 - 如果 agency 或 creator 的 KYC / KYB 资料不完整，支付能力可能被暂停，需补件后恢复。
+- Stripe、Plaid、Dwolla 分别承接不同环节，任何一家供应商的审核、断连或策略变更都会放大 support 压力。
 - 这说明 Melon 的真实能力不只是自动扣款，还包括异常识别、通知、人工 review 和运营兜底。
 
 ## Invoice Split
@@ -114,16 +119,20 @@ sequenceDiagram
   participant Creator as Creator
   participant Platform as OnlyFans / Chaturbate
   participant Melon as Melon
-  participant Partners as Plaid / Dwolla / Wise
+  participant Stripe as Stripe
+  participant Plaid as Plaid
+  participant Dwolla as Dwolla / ACH Partner
   participant Referral as Referral / Chat Team
 
-  Agency->>Melon: 注册并创建 split
+  Agency->>Stripe: 提交 KYC / tax 信息
+  Stripe-->>Melon: 返回 requirements / tax status
+  Agency->>Melon: 创建 split
   Melon-->>Creator: 发送邀请
-  Creator->>Partners: 连接银行账户
+  Creator->>Plaid: 连接银行账户
   Creator->>Melon: 接受 split 条款
   Platform->>Creator: 平台收入入账
-  Melon->>Partners: 发起 ACH 扣款 / 跟踪清算状态
-  Partners-->>Melon: 返回成功 / 失败 / 待处理状态
+  Melon->>Dwolla: 发起 ACH 扣款 / 跟踪清算状态
+  Dwolla-->>Melon: 返回成功 / 失败 / 待处理状态
   Melon-->>Agency: 周度 payout 与报表
   Agency->>Melon: 可选配置 referral split
   Melon-->>Referral: 次周发起二次 payout
@@ -133,6 +142,7 @@ sequenceDiagram
 # 核心功能
 
 - Creator Split：基于平台入账的自动分账。
+- Agency KYC / Tax Onboarding：通过第三方完成主体核验、税务信息收集与税表交付。
 - Referral Split：agency 对 referral/chat team 的二次分账。
 - Multi-participant split：多参与方分账。
 - Weekly payout：周度汇总结算给 agency。
@@ -145,7 +155,8 @@ sequenceDiagram
 
 - `垂直工作流理解`：不是泛支付工具，而是深度贴合 creator agency 的“关系型分账”场景。
 - `金融正确性`：真正难点在账本、状态机、异常处理、周结和争议处理，不在前端界面。
-- `信任与合规链路`：对 Plaid、Dwolla、Wise 等合作方的接入与运营经验会形成门槛。
+- `信任与合规链路`：对 Stripe、Plaid、Dwolla、Wise 等合作方的接入与运营经验会形成门槛。
+- `多供应商编排能力`：Stripe、Plaid、Dwolla、Wise 的职责拆分本身就是产品复杂度，谁能把这条链路稳定跑通，谁就更难被简单复制。
 - `嵌入式替代成本`：一旦 agency 把分账、报表和 payout 都迁移到 Melon，切换回 Excel 或手工流程的成本会上升。
 - `运营经验沉淀`：对 relink、insufficient funds、KYC 缺资料、cutoff 等异常的处理方式会形成隐性壁垒。
 
@@ -165,18 +176,21 @@ sequenceDiagram
 - `支付合作方风险`：成人/订阅内容相关生态对支付合作方的接受度变化较大。
 - `账户连接风险`：Plaid 断连、银行凭证更新会导致自动分账失败。
 - `争议与回退风险`：ACH 存在退票、争议、清算延迟，必须依赖人工运营兜底。
+- `多供应商协调风险`：Stripe、Plaid、Dwolla、Wise 分属不同环节，产品文案、support、合规和技术实现必须保持一致。
 - `跨境复杂度风险`：国际 agency 与加拿大 creator 路径会显著增加 KYC、支付、support 复杂度。
 - `文档一致性风险`：公开条款与帮助中心对国际支持边界存在不完全一致之处。
 
 ## 成本分析
 
 - `显性第三方成本`
-  - `银行连接与支付`：`Plaid` 未公开统一标准单价，`Dwolla` 为 `custom pricing`。这两项是核心外部成本，但当前需以商务报价为准。
+  - `KYC / tax onboarding`：如采用 `Stripe Connect` 或同类方案，agency 端开户、KYC、tax forms 本身也是独立的第三方成本面。Stripe 官方公开的是按方案和地区变化的定价模型，而不是一个适用于所有平台场景的单一价格。
+  - `银行连接与支付`：`Plaid` 未公开统一标准单价，`Dwolla` 也是 `custom pricing`，需以商务报价为准。
   - `通知与验证`：`Twilio SMS` 美国基础价从 ` $0.0083 / segment ` 起，另有 carrier fee；`Twilio Verify` 为 ` $0.05 / successful verification + $0.0083 / SMS `。以 `2,000` 条短信/月估算，基础短信费用约 ` $16.6/月 `。
   - `跨境能力`：如覆盖国际 agency 或加拿大 creator，`Wise` 一次性开通费 ` $31 `，接收 USD wire ` $6.11 / 笔 `。
   - `账单数据来源`：若不自建 invoice 数据能力，可接 `FansMetric`。其 Standard 为 ` $39/月/账号 `，Pro 为 ` $99/月/账号 `；按 `20` 个 creator 估算，月成本约 ` $780 - $1,980 `。
 - `隐性但更关键的成本`
   - 长期成本大头通常来自支付合作方商务条款、KYC / 风控、准备金要求、退票与争议处理，以及人工审核和客服 support。
+  - 如果采用 Plaid partner 模式，partner 使用你的 `processor token` 产生的 Plaid 调用也会计入你的账单，这会影响真实 unit economics。
   - 这些成本当前无法从公开资料精确量化，需要在支付合作方准入和商务沟通后才能形成可靠预算。
 
 # 参考来源
@@ -208,12 +222,27 @@ sequenceDiagram
 - `Using Melon as a Canadian Creator – Wise US Bank Account Setup`
   - URL：https://help.getmelon.io/en/articles/11994736-using-melon-as-a-canadian-creator-wise-us-bank-account-setup
   - 用于支持：加拿大 creator 需要 Wise US bank account，OnlyFans 与 Melon 以 USD 路径运行。
+- `Update your KYC info on Melon`
+  - URL：https://help.getmelon.io/en/articles/8987119-update-your-kyc-info-on-melon
+  - 用于支持：Melon 会因未满足 Stripe KYC 要求而延迟 payout，说明 Stripe 参与 agency 侧 KYC 环节。
+- `Understanding Your 1099 Tax Forms with Melon [2024 Tax Season]`
+  - URL：https://help.getmelon.io/en/articles/10543097-understanding-your-1099-tax-forms-with-melon-2024-tax-season
+  - 用于支持：Melon 与 Stripe 合作处理 tax reporting，符合条件的用户可通过 Stripe Express 查看税表。
+- `Stripe Connect Pricing`
+  - URL：https://stripe.com/connect/pricing
+  - 用于支持：Stripe Connect 的成本模型取决于平台方案与地区，说明 KYC / tax onboarding 本身也是单独的第三方成本面。
+- `Stripe Connect onboarding`
+  - URL：https://docs.stripe.com/connect/custom/onboarding
+  - 用于支持：平台可通过 hosted / API 方式完成 connected account onboarding，可映射 agency 侧 KYC 主流程。
+- `Stripe tax form delivery`
+  - URL：https://docs.stripe.com/connect/deliver-tax-forms
+  - 用于支持：税表交付可由 Stripe Connect 承接，适用于 1099 交付这一合规环节。
 - `Plaid Pricing`
   - URL：https://plaid.com/pricing/
   - 用于支持：Plaid 采用 one-time / subscription / per-request 三类计费模型；官方未在公开页披露统一单价。
 - `Plaid Pricing and Billing`
   - URL：https://plaid.com/docs/account/billing/
-  - 用于支持：Plaid 价格主要受产品形态与 plan 影响，公开文档不提供统一价目表。
+  - 用于支持：Plaid 提供 `Pay as you go / Growth / Custom` 三类 plan；文档中的 `up to $6,000/month`、`over $2,000/month` 是适用规模提示而非公开报价；`Auth` 属一次性收费，`Transactions` 等属于按 Item 的持续订阅；partner 调用也会计入你的账单。
 - `Dwolla Pricing`
   - URL：https://www.dwolla.com/pricing/
   - 用于支持：Dwolla 为 `custom pricing`，属于需商务确认的核心支付成本。
@@ -229,3 +258,6 @@ sequenceDiagram
 - `FansMetric Pricing`
   - URL：https://fansmetric.com/pricing
   - 用于支持：FansMetric Standard ` $39/月/账号 `、Pro ` $99/月/账号 `，可作为 invoice 数据能力的第三方成本参考。
+- `共享页面补充证据（非官方）`
+  - URL：https://chatgpt.com/share/69b3d532-0b44-8000-8326-48a9bbcf9c8c
+  - 用于支持：agency 端 KYC / Tax 页面跳转到 `connect.stripe.com/setup/` 的截图层面补充观察；只用于辅助判断，不单独支撑产品事实或数据。

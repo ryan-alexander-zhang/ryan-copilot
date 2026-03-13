@@ -33,6 +33,25 @@
   - 给 referral/chat team 二次分钱；
   - 减少 Excel 对账和人际摩擦。
 
+## 供应商策略含义
+
+### 确认事实
+
+- Melon 官方文档明确把 `Plaid` 放在 creator 银行连接链路中。
+- Melon 服务条款明确要求启用 `Dwolla` 相关账户与条款。
+- Melon 的 KYC / 税务帮助文档明确提到 `Stripe`，包括 KYC 补件与 1099 tax forms。
+
+### 推断
+
+- 置信度：`高`
+- 这说明 Melon 的核心策略不是自建全部金融基础设施，而是把不同监管面交给不同供应商：
+  - `Stripe` 处理 agency 侧 KYC / tax reporting / tax form delivery；
+  - `Plaid` 处理银行连接；
+  - `Dwolla` 处理 ACH 资金移动；
+  - `Wise` 处理部分跨境 USD 银行路径。
+- 这种策略的直接好处是更快上线、更少自持合规负担。
+- 代价是产品本身必须成为“多供应商编排层”，并承担用户解释、异常切换与文档一致性的复杂度。
+
 ## 目标客户与付费者
 
 ### 确认事实
@@ -153,6 +172,7 @@ Melon 面临的替代方案，不只是“别的 SaaS”，还包括更原始但
 ### 可能的护城河
 
 - 对创作者 agency 财务流程的深度理解。
+- 对 `Stripe + Plaid + Dwolla + Wise` 这类多供应商链路的编排能力。
 - 对异常情况的经验积累：
   - 资金不足；
   - 断连；
@@ -174,6 +194,7 @@ Melon 面临的替代方案，不只是“别的 SaaS”，还包括更原始但
 - 置信度：`中`
 - Melon 的护城河不太像“深不可测的技术壁垒”，而更像：
   - 金融工作流正确性；
+  - 多供应商编排与合规边界处理；
   - 运营经验；
   - 垂直市场信任；
   - 支付合作链路可用性。
@@ -182,6 +203,7 @@ Melon 面临的替代方案，不只是“别的 SaaS”，还包括更原始但
 
 - `平台生态风险`：OnlyFans、Chaturbate 等平台政策调整会波及整个资金流模式。
 - `支付接受度风险`：成人/订阅内容相关生态对支付合作方和银行接受度要求高。
+- `供应商协调风险`：Stripe、Plaid、Dwolla 与 Wise 分别承担不同职责，任何一家调整审核标准、产品政策或 API 行为，都会放大 Melon 的 support 与交付压力。
 - `产品挤压风险`：更大的 agency OS 如果把 payouts 与 ledger 做进去，Melon 的差异化会被稀释。
 - `跨境复杂度风险`：帮助中心展示了国际 agency 和加拿大 creator 路径，但跨境支持越多，支付、税务、KYC 和 support 成本越高。
 - `法务一致性风险`：美国条款和国际帮助文档之间的边界如果不持续维护，会影响企业客户尽调。
@@ -197,6 +219,10 @@ Melon 不是在争夺“谁是最好用的 OnlyFans agency 软件”，而是在
 - How to become a Melon affiliate：https://help.getmelon.io/en/articles/8507342-how-to-become-a-melon-affiliate
 - What is a Referral Split?：https://help.getmelon.io/en/articles/8136980-what-is-a-referral-split
 - Automated Invoicing with Melon：https://help.getmelon.io/en/articles/12005317-automated-invoicing-with-melon
+- Update your KYC info on Melon：https://help.getmelon.io/en/articles/8987119-update-your-kyc-info-on-melon
+- Understanding Your 1099 Tax Forms with Melon [2024 Tax Season]：https://help.getmelon.io/en/articles/10543097-understanding-your-1099-tax-forms-with-melon-2024-tax-season
+- Stripe Connect onboarding：https://docs.stripe.com/connect/custom/onboarding
+- Stripe tax form delivery：https://docs.stripe.com/connect/deliver-tax-forms
 - FansMetric Pricing：https://fansmetric.com/pricing
 - Infloww Pricing：https://infloww.com/pricing
 - OFManager Pricing：https://ofmanager.com/pricing

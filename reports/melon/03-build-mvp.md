@@ -123,7 +123,11 @@ flowchart LR
 
 - 尽量不自持资金。
 - 尽量不自己落到“代表任意双方传递资金”的事实模式里。
-- 尽量把 KYC、资金移动、部分合规责任交给支付合作方承接。
+- 尽量把 KYC、tax reporting、资金移动、部分合规责任交给支付合作方承接。
+- 在架构上把三类职责明确拆开：
+  - `Stripe-like`：agency 侧 KYC、税务信息采集、1099 / e-delivery；
+  - `Plaid-like`：creator 银行连接与账户数据；
+  - `Dwolla-like`：funding source、ACH debit、payout 与状态回调。
 - 在产品设计上清晰界定：
   - 谁是付款人；
   - 谁授权扣款；
@@ -153,6 +157,7 @@ flowchart LR
 
 ### 5.2 已确认的现产品依赖线索
 
+- `Stripe`：Melon 官方帮助中心明确提到 `Stripe` 的 KYC 要求与 1099 tax forms；共享页面中的补充截图还显示 agency 侧会跳到 `connect.stripe.com/setup/`，可作为 `Stripe-hosted onboarding` 的辅助证据。
 - `Plaid`：Melon 官方文档明确要求 creator 通过 Plaid 连接银行。
 - `Dwolla`：Melon 服务条款明确要求启用 Dwolla 账户与相关条款。
 - `Wise`：Melon 官方帮助中心明确用于国际 agency / 加拿大 creator 的 USD 银行路径。
@@ -165,15 +170,18 @@ flowchart LR
 
 | 流程阶段 | 接口 / 能力 | 状态 | 何时调用 | 关键输入 / 输出 / 回调 | 官方文档 |
 | --- | --- | --- | --- | --- | --- |
-| Agency 注册与 KYB | `Dwolla Customers` 创建业务主体 | `Likely via confirmed vendor` | agency 注册、提交实体资料时 | 入：legal name、EIN、address、controller；出：`customerId`、`status` | [Create a customer](https://developers.dwolla.com/docs/api-reference/customers/create-a-customer) |
-| Agency 受益人资料补齐 | `Dwolla Beneficial Owners` | `Likely via confirmed vendor` | 业务主体需要补充 UBO / beneficial owner 时 | 入：owner 身份资料；出：beneficial owner 记录；后续还要认证状态 | [Create beneficial owner](https://developers.dwolla.com/docs/api-reference/beneficial-owners/create-beneficial-owner), [Certify beneficial ownership](https://developers.dwolla.com/docs/api-reference/beneficial-owners/certify-beneficial-ownership-status) |
-| Agency KYC 文件上传 | `Dwolla Documents` | `Likely via confirmed vendor` | Dwolla 要求补件或人工审核时 | 入：法人/公司证明文件；出：document 资源与审核状态 | [Create a document for customer](https://developers.dwolla.com/docs/api-reference/documents/create-a-document-for-customer) |
+| Agency KYC / KYB 启动 | `Stripe Connect onboarding` | `Likely via confirmed vendor` | agency 注册后、首次启用 payout 前 | 入：主体类型、法人与业务资料；出：account onboarding flow、requirements 状态 | [Connect onboarding](https://docs.stripe.com/connect/custom/onboarding), [Account onboarding component](https://docs.stripe.com/connect/supported-embedded-components/account-onboarding) |
+| Agency KYC 补件 / remediation | `Stripe identity verification / requirements remediation` | `Likely via confirmed vendor` | 资料不全、审核失败、被要求补件时 | 入：身份文件、业务补充信息；出：verification / requirements 状态 | [Identity verification](https://docs.stripe.com/connect/identity-verification), [Handle verification with the API](https://docs.stripe.com/connect/handle-verification-updates) |
+| Agency 税务信息采集与交付 | `Stripe tax forms / Stripe Express` | `Likely via confirmed vendor` | 首次收款前、税季、1099 交付时 | 入：税务主体资料、e-delivery 同意；出：税表可用状态、Express 查看路径 | [Deliver tax forms](https://docs.stripe.com/connect/deliver-tax-forms), [Express dashboard taxes](https://docs.stripe.com/connect/platform-express-dashboard-taxes) |
+| 资金移动层主体创建 | `Dwolla Customers` 创建业务主体 | `Likely via confirmed vendor` | agency 需要在 ACH 层持有 customer / funding source 时 | 入：legal name、EIN、address、controller；出：`customerId`、`status` | [Create a customer](https://developers.dwolla.com/docs/api-reference/customers/create-a-customer) |
+| 资金移动层受益人资料补齐 | `Dwolla Beneficial Owners` | `Likely via confirmed vendor` | Dwolla 需要补充 UBO / beneficial owner 时 | 入：owner 身份资料；出：beneficial owner 记录；后续还要认证状态 | [Create beneficial owner](https://developers.dwolla.com/docs/api-reference/beneficial-owners/create-beneficial-owner), [Certify beneficial ownership](https://developers.dwolla.com/docs/api-reference/beneficial-owners/certify-beneficial-ownership-status) |
+| 资金移动层文件上传 | `Dwolla Documents` | `Likely via confirmed vendor` | Dwolla 要求补件或人工审核时 | 入：法人/公司证明文件；出：document 资源与审核状态 | [Create a document for customer](https://developers.dwolla.com/docs/api-reference/documents/create-a-document-for-customer) |
 | Creator 银行连接初始化 | `Plaid Link` + `link_token` | `Confirmed dependency` | creator 点击邀请链接、开始绑定银行时 | 入：`client_user_id`、产品范围、回调配置；出：`link_token`，前端启动 Link | [Plaid Link overview](https://plaid.com/docs/link/), [Link token create](https://plaid.com/docs/api/link/#linktokencreate) |
 | Creator 银行连接落库 | `Plaid public_token exchange / item lifecycle` | `Likely via confirmed vendor` | creator 完成 Link 之后 | 入：`public_token`；出：`access_token`、`item_id`，后续进入 Item 管理 | [Plaid Link API](https://plaid.com/docs/api/link/), [Items API](https://plaid.com/docs/api/items/) |
 | 获取账户与 ACH 细节 | `Plaid Auth` | `Likely via confirmed vendor` | Link 成功后、创建可扣款 funding source 前 | 入：`access_token`；出：账户、routing/account number、验证状态、Auth webhooks | [Auth API](https://plaid.com/docs/api/products/auth/#authget) |
 | Creator 银行断连或重连 | `Plaid Update Mode` | `Likely via confirmed vendor` | Item 失效、bank relink、凭据更新时 | 入：旧 `access_token` / `link_token`；出：重新授权结果 | [Update mode](https://plaid.com/docs/link/update-mode/) |
 | Item 生命周期与异常 | `Plaid Item webhooks` | `Likely via confirmed vendor` | 权限撤销、账户更新、webhook URL 更新确认等 | 出：`ITEM` 相关 webhook；驱动 relink 与异常处理队列 | [Items webhooks](https://plaid.com/docs/api/items/#webhooks) |
-| Plaid 与 Dwolla 桥接 | `Plaid x Dwolla partnership guide` | `Likely via confirmed vendor` | 设计 funding source 与 exchange 流程时 | 作为官方集成设计参考，不是单一 API | [Plaid + Dwolla guide](https://plaid.com/docs/auth/partnerships/dwolla/) |
+| Plaid 与 Dwolla 桥接 | `Plaid x Dwolla partnership guide` | `Likely via confirmed vendor` | 设计 funding source 与 exchange 流程时 | 作为官方集成设计参考，不是单一 API；若 partner 使用你的 processor token 发起 Plaid 调用，相关使用量仍会计入你的 Plaid 账单 | [Plaid + Dwolla guide](https://plaid.com/docs/auth/partnerships/dwolla/), [Plaid billing](https://plaid.com/docs/account/billing/) |
 | 建立 exchange session | `Dwolla Exchange Sessions` | `Likely via confirmed vendor` | creator 银行连接后，要把银行关系映射进 Dwolla 时 | 入：customer、exchange partner 上下文；出：exchange session | [Create customer exchange session](https://developers.dwolla.com/docs/api-reference/exchange-sessions/create-customer-exchange-session) |
 | 建立 exchange 资源 | `Dwolla Exchanges` | `Likely via confirmed vendor` | exchange session 完成后 | 入：exchange token / session 结果；出：exchange 资源，可继续生成 funding source | [Create an exchange for a customer](https://developers.dwolla.com/docs/api-reference/exchanges/create-an-exchange-for-a-customer) |
 | 建立 funding source | `Dwolla Funding Sources` | `Likely via confirmed vendor` | customer 已通过 KYB/KYC 且 exchange 准备好后 | 入：customer、exchange 或 bank data；出：funding source URL / id | [Create customer funding source](https://developers.dwolla.com/docs/api-reference/funding-sources/create-customer-funding-source) |
@@ -203,7 +211,8 @@ flowchart LR
 | 模块 | 内部接口 / 事件边界 | 暴露范围 | 上游触发 | 下游依赖 | 为什么必须 |
 | --- | --- | --- | --- | --- | --- |
 | Identity & Tenant | `POST /orgs`, `POST /members/invite`, `POST /sessions`, `GET /me` | public | agency 注册、团队协作 | KYC、split、报表 | 没有租户边界就无法区分 agency、creator、referral 的数据权限 |
-| Onboarding & KYC | `POST /kyb/applications`, `POST /kyc/documents`, `GET /kyc-status`, `event:kyc.status.changed` | public + internal | agency/creator 提交资料 | Dwolla / Wise /人工审核 | 直接决定谁能创建 funding source、谁能收 payout |
+| Onboarding & KYC | `POST /kyb/applications`, `POST /kyc/documents`, `GET /kyc-status`, `event:kyc.status.changed` | public + internal | agency/creator 提交资料 | Stripe / Wise / 人工审核 | 直接决定谁能创建 funding source、谁能收 payout |
+| Tax Reporting & Forms | `POST /tax-profiles`, `POST /tax-delivery-consents`, `GET /tax-forms`, `event:tax_form.available` | public + internal | agency 首次收款、税季、Stripe 回调 | Stripe、reporting、ops | 如果做 agency payout，就不能把税表采集与交付继续藏在人工流程里 |
 | Bank Link Orchestrator | `POST /bank-link-sessions`, `POST /bank-links/exchange`, `POST /bank-links/relink`, `event:item.relink_required` | public + internal | creator 点击连接银行 | Plaid、Dwolla exchange | 负责把前端 Link 会话与后端 access token / item 生命周期接起来 |
 | Split Rules | `POST /splits`, `PATCH /splits/{id}`, `POST /splits/{id}/participants`, `event:split.activated` | public | agency 创建或调整分成 | ledger、payments | 是计费和扣款金额计算的唯一规则源 |
 | Deposit Intake / Invoice Basis | `POST /deposit-events/import`, `POST /invoice-cycles`, `POST /invoice-links` | public + internal | 平台入账检测、手工导入、FansMetric 数据同步 | payments、notifications | 不管是 bank-trigger 还是 invoice-trigger，都要先形成一个可审计的应收基准 |
@@ -219,6 +228,7 @@ flowchart LR
 
 如果只做美国本土 ACH MVP，第一阶段最小闭环建议只先打通下面这组接口：
 
+- `Stripe Connect onboarding + tax forms / Express`
 - `Plaid Link + Link Token + Auth + Items webhooks`
 - `Dwolla Customer / Funding Source / ODA / Transfer / Webhook`
 - `一种短信渠道`，优先 Twilio
@@ -228,6 +238,7 @@ flowchart LR
 这组接口已经足够完成：
 
 - agency 注册
+- agency KYC / tax onboarding
 - creator 接受邀请并连银行
 - split 生效
 - 检测应收
@@ -239,6 +250,7 @@ flowchart LR
 ### 5.6 可以交给第三方的部分
 
 - KYC / KYB / beneficial ownership 采集与部分审核。
+- 税务主体资料采集、1099 tax form 交付与 e-delivery。
 - 银行账户连接与账户验证。
 - funding source 托管与 ACH 资金移动。
 - 短信发送、验证码与邮件发送。
@@ -277,10 +289,18 @@ flowchart LR
 - Twilio Verify 美国短信验证价格为 ` $0.05 / successful verification + $0.0083 / SMS `。
   - 证据等级：`High`
   - 来源：https://www.twilio.com/en-us/verify/pricing
-- Plaid 官方公开的是计费模型与账单文档，但不公开统一标准单价。
+- Plaid 官方文档未公开统一标准单价，但公开了 plan 与计费触发方式：
+  - pricing plans 分为 `Pay as you go`、`Growth`、`Custom`；
+  - 文档中提到的 `up to $6,000/month`、`over $2,000/month` 是对 API usage volume / 月度用量规模的适用区间说明，不是公开报价，也不是固定月费；
+  - `Auth`、`Identity` 等属于 `one-time fee`；
+  - `Transactions`、`Recurring Transactions`、`Liabilities`、`Investments` 属于 `subscription fee`，只要 Item 未被移除就会按月持续计费；
+  - partner 若使用你的 `processor token` 调用 Plaid，相关使用量仍按你的账单计费。
   - 证据等级：`Do not quantify`
   - 来源：https://plaid.com/pricing/
   - 来源：https://plaid.com/docs/account/billing/
+- Stripe Connect 官方公开页显示：其平台收费模式会因“由 Stripe 向 connected accounts 定价”还是“由平台自行定价”而不同，并按地区显示不同价格；这意味着 agency KYC / tax / connected account 管理本身也是单独的供应商成本面。
+  - 证据等级：`Do not quantify by one global number`
+  - 来源：https://stripe.com/connect/pricing
 - Dwolla 官方 pricing 页面明确说明是 `custom pricing`，未公开统一标准价。
   - 证据等级：`Do not quantify`
   - 来源：https://www.dwolla.com/pricing
@@ -310,6 +330,13 @@ flowchart LR
 - 例子：若每月发送 `2,000` 条美国短信，按 Twilio 基础价估算，短信基础发送成本约 ` $16.6/月 `，但还未计入 carrier fee。
   - 证据等级：`Medium`
   - 依据：https://www.twilio.com/en-us/sms/pricing/us
+- 对本文推荐的 Plaid 用法来说，最可能触发的是 `Auth` 的一次性费用，而不是 `Transactions` 这类持续订阅费用。
+  - 这意味着如果你只是为了 bank link、routing/account 获取和 Dwolla exchange，就应尽量把 Plaid 范围收敛在 `Link + Auth`，避免不必要地引入会按 Item 月费持续计费的产品。
+  - 证据等级：`High`
+  - 依据：https://plaid.com/docs/account/billing/
+- 反过来，如果你未来为了替代“银行入账扫描”而直接使用 `Transactions`，成本模型会从“一次性开户成本”切换为“按 Item 持续月费”，并且只有在 `item/remove` 或终端用户 depermission 后才会停止。
+  - 证据等级：`High`
+  - 依据：https://plaid.com/docs/account/billing/
 - 如果你不自建 invoice 所需的 creator 账单依据，而是借现成 agency OS 数据：
   - `20` 个 creator 账号接 FansMetric Standard，大约 ` $780/月 `
   - `20` 个 creator 账号接 FansMetric Pro，大约 ` $1,980/月 `
@@ -365,6 +392,7 @@ System_Boundary(mvp, "MVP") {
   ContainerDb(db, "Ledger DB", "PostgreSQL", "用户、split、交易、审计")
   Container(admin, "Ops Console", "Internal Web App", "人工 review 与支持")
 }
+System_Ext(kyc, "KYC / Tax Provider", "如 Stripe Connect")
 System_Ext(banklink, "Bank Link Provider", "如 Plaid")
 System_Ext(payment, "Payment Processor", "如 Dwolla")
 System_Ext(msg, "Email / SMS Provider", "如 Twilio")
@@ -374,6 +402,7 @@ Rel(creator, web, "接受邀请 / 查看付款")
 Rel(web, api, "HTTPS")
 Rel(api, db, "读写")
 Rel(api, worker, "触发任务")
+Rel(api, kyc, "KYC / tax onboarding")
 Rel(worker, payment, "发起支付 / 查询状态")
 Rel(api, banklink, "连接银行")
 Rel(worker, msg, "发送通知")
@@ -385,10 +414,19 @@ Rel(admin, api, "人工处理异常")
 - Melon 官网：https://www.getmelon.io/
 - Terms of Service：https://www.getmelon.io/terms-of-service
 - What tax and business documentation does Melon require?：https://help.getmelon.io/en/articles/7861465-what-tax-and-business-documentation-does-melon-require
+- Update your KYC info on Melon：https://help.getmelon.io/en/articles/8987119-update-your-kyc-info-on-melon
+- Understanding Your 1099 Tax Forms with Melon [2024 Tax Season]：https://help.getmelon.io/en/articles/10543097-understanding-your-1099-tax-forms-with-melon-2024-tax-season
 - What is a Referral Split?：https://help.getmelon.io/en/articles/8136980-what-is-a-referral-split
 - Automated Invoicing with Melon：https://help.getmelon.io/en/articles/12005317-automated-invoicing-with-melon
 - Melon for non-US/Canada agencies：https://help.getmelon.io/en/articles/9020125-melon-for-non-us-canada-agencies
 - Using Melon as a Canadian Creator – Wise US Bank Account Setup：https://help.getmelon.io/en/articles/11994736-using-melon-as-a-canadian-creator-wise-us-bank-account-setup
+- Stripe Connect Pricing：https://stripe.com/connect/pricing
+- Stripe Connect onboarding：https://docs.stripe.com/connect/custom/onboarding
+- Stripe account onboarding component：https://docs.stripe.com/connect/supported-embedded-components/account-onboarding
+- Stripe identity verification：https://docs.stripe.com/connect/identity-verification
+- Stripe handle verification updates：https://docs.stripe.com/connect/handle-verification-updates
+- Stripe tax form delivery：https://docs.stripe.com/connect/deliver-tax-forms
+- Stripe Express tax forms：https://docs.stripe.com/connect/platform-express-dashboard-taxes
 - Plaid Pricing：https://plaid.com/pricing/
 - Plaid Billing Docs：https://plaid.com/docs/account/billing/
 - Plaid Link overview：https://plaid.com/docs/link/
@@ -430,3 +468,4 @@ Rel(admin, api, "人工处理异常")
 - FinCEN Merchant Payment Processor Ruling：https://www.fincen.gov/resources/statutes-regulations/administrative-rulings/definition-money-transmitter-merchant-payment
 - IRS 1099-K update on 2025-10-23：https://www.irs.gov/newsroom/irs-issues-faqs-on-form-1099-k-threshold-under-the-one-big-beautiful-bill-dollar-limit-reverts-to-20000
 - OFAC Sanctions List Search Tool：https://ofac.treasury.gov/sanctions-list-search-tool
+- 补充证据（非官方共享页面，仅用于辅助判断）：https://chatgpt.com/share/69b3d532-0b44-8000-8326-48a9bbcf9c8c
