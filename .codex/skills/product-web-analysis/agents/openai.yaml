@@ -1,4 +1,4 @@
 interface:
   display_name: "Product Web Analysis"
-  short_description: "Analyze a product from its name or URL."
-  default_prompt: "Use $product-web-analysis to analyze this product from its name or URL and produce a sourced report in my preferred language."
+  short_description: "Analyze a product or produce a sourced MVP build report from its name or URL."
+  default_prompt: "Use $product-web-analysis to analyze this product from its name or URL and produce sourced Product Understanding, Market And Strategy, and Build MVP reports in my preferred language."

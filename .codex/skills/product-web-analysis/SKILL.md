@@ -1,6 +1,6 @@
 ---
 name: product-web-analysis
-description: Analyze a product from a user-provided product name or URL using web search and official public sources, then produce a structured product intelligence report in the user's requested language. Use when Codex needs product analysis, website analysis, product research, competitor analysis, product teardown, reverse analysis of a SaaS or tool, or an explanation of what a product does, who it serves, use cases, requirements, pain points, dependencies, business model clues, or likely technical architecture. Trigger on requests such as analyze this product, analyze this website, explain this product, summarize this SaaS, infer the architecture, compare these products, or Chinese requests like 分析这个产品、分析这个网站、产品分析、竞品分析、产品拆解、技术架构推断、产品调研、逆向分析这个产品、根据产品名称或URL生成报告. Generate reports with flowcharts, sequence diagrams, and C4 diagrams while clearly separating confirmed facts from reasoned inference.
+description: Analyze a product from a user-provided product name or URL using web search and official public sources, then produce structured reports in the user's requested language. Use when Codex needs product analysis, website analysis, product research, competitor analysis, product teardown, reverse analysis of a SaaS or tool, or an MVP build assessment for a similar product, including scope, dependencies, compliance, cost, and technical architecture suggestions. Trigger on requests such as analyze this product, analyze this website, explain this product, summarize this SaaS, infer the architecture, compare these products, assess whether it is worth building, estimate MVP cost or feasibility, or Chinese requests like 分析这个产品、分析这个网站、产品分析、竞品分析、产品拆解、技术架构推断、产品调研、逆向分析这个产品、根据产品名称或URL生成报告、评估能不能做、做MVP拆解、估算开发成本. Generate reports with flowcharts, sequence diagrams, and C4 diagrams while clearly separating confirmed facts from reasoned inference.
 ---
 
 # Product Web Analysis
@@ -9,7 +9,10 @@ description: Analyze a product from a user-provided product name or URL using we
 
 Use this skill to research a public product on the web and turn scattered evidence into a structured report. Accept either a product name or a product URL, adapt the report language to the user's request, and keep a hard boundary between confirmed facts and inference.
 
-This skill is primarily for understanding and analyzing an existing product as it appears in public. It is not primarily a product design, implementation planning, or PRD-writing workflow.
+This skill is primarily for understanding and analyzing an existing
+product as it appears in public. The first two reports stay analytical.
+The third report is the only build-oriented output and should stay
+focused on an early MVP rather than a full PRD.
 
 Typical Chinese triggers include `分析这个产品`, `分析这个网站`, `做一个产品分析`, `做竞品分析`, `拆解这个 SaaS`, `推断技术架构`, and `根据这个 URL 做产品调研`.
 
@@ -17,7 +20,7 @@ Read these templates when you need the full output structure:
 
 - [references/product-understanding-template.md](references/product-understanding-template.md)
 - [references/market-strategy-template.md](references/market-strategy-template.md)
-- [references/build-feasibility-cost-template.md](references/build-feasibility-cost-template.md)
+- [references/build-mvp-template.md](references/build-mvp-template.md)
 - [references/diagram-templates.md](references/diagram-templates.md)
 
 ## Inputs
@@ -52,9 +55,33 @@ By default, produce three separate reports rather than one monolithic report:
 
 1. `Product Understanding`
 2. `Market And Strategy`
-3. `Build Feasibility And Cost`
+3. `Build MVP`
 
 All three are default outputs. Do not collapse them into one long report unless the user explicitly asks for a single-file format.
+
+## Build MVP Deliverable
+
+Use [references/build-mvp-template.md](references/build-mvp-template.md)
+for the third report.
+
+The `Build MVP` report should answer one bounded question: if someone
+wants to launch a credible early version of a similar product, what is
+the smallest useful scope, what are the main blockers, what dependencies
+and compliance constraints matter, what will likely cost money, and what
+technical architecture is appropriate now.
+
+By default, organize the `Build MVP` report into these seven sections:
+
+1. MVP goals and boundaries
+2. Core challenges analysis
+3. MVP core flow
+4. Compliance and qualification analysis
+5. Dependency research and interface inventory
+6. Cost analysis
+7. Technical architecture recommendation
+
+Keep this report simple, staged, and actionable. Avoid turning it into a
+full backlog or enterprise target-state architecture.
 
 ## Workflow
 
@@ -205,6 +232,9 @@ When cost research mode is active:
    - `Scenario-based build-cost estimates`
 6. If official pricing is unavailable, state that clearly and do not invent precise numbers.
 
+Place this material inside the `Cost Analysis` section of the `Build MVP`
+report rather than as a separate standalone report.
+
 Use these evidence levels in cost research:
 
 - `High`: official page directly states the pricing, fee, or billing rule
@@ -232,7 +262,16 @@ Evidence discipline for cost research:
 - Keep the glossary generic to the analyzed product's domain. Do not reuse terms from previous products unless they actually apply here.
 - Keep the product-analysis reports centered on understanding the product as-is: what it does, who it serves, how it works, what constraints shape it, and what is likely true about its business and technical design.
 - Do not let product-analysis reports drift into implementation advice, backlog design, system design prescriptions, or pseudo-PRD content.
-- Keep build-oriented content in the dedicated `Build Feasibility And Cost` report.
+- Keep build-oriented content in the dedicated `Build MVP` report.
+- Structure the `Build MVP` report with the seven required sections from
+  the Build MVP template.
+- In the `Build MVP` report, explicitly answer which features trigger
+  regulation, what qualifications or licenses may be needed, which items
+  can be covered by third parties, which interfaces are required by the
+  MVP flow, and why the recommended architecture fits an early MVP.
+- If compliance, licensing, dependency, or vendor details cannot be
+  confirmed, label them as `推测` or `待验证项` when writing in Chinese, or
+  use an equivalent localized uncertainty label in other languages.
 - Prefer analyzing realistic user alternatives over a shallow list of named competitors.
 - Include business model, competitive positioning, growth/distribution, and moat analysis when public evidence supports it.
 - Include data, security, and compliance analysis when they materially affect the product.
@@ -256,10 +295,10 @@ Include, at minimum:
 
 - A `Product Understanding` report
 - A `Market And Strategy` report
-- A `Build Feasibility And Cost` report
+- A `Build MVP` report
 
 The first two are product-analysis outputs.
-The third is the build-oriented output.
+The third is the MVP-build-oriented output.
 
 ## Boundary between analysis and build guidance
 
@@ -268,7 +307,9 @@ Use this distinction consistently:
 - `Product analysis`: what the product appears to do, how it is positioned, how users likely adopt it, what dependencies and risks shape it, what business and technical properties are visible from public evidence.
 - `Build guidance`: what someone should build, in what order, with which scope, modules, or implementation choices.
 
-When the user asks for general product analysis, still produce all three default reports, but keep the first two as product analysis and the third as build-oriented output.
+When the user asks for general product analysis, still produce all three
+default reports, but keep the first two as product analysis and the
+third as the build-oriented `Build MVP` output.
 
 In the build-oriented report, distinguish clearly between:
 
