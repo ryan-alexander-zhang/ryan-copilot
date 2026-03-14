@@ -158,13 +158,13 @@ sequenceDiagram
   - 风险：高度依赖 OnlyFans、Chaturbate 等上游平台的打款规则与生态稳定性，平台政策变化会直接冲击主流程。
 - `金融正确性与异常处理`
   - 壁垒：真正难点在账本、状态机、异常处理、周结和争议处理，不在前端界面。
-  - 风险：ACH 存在退票、争议、清算延迟，必须长期依赖人工运营与异常兜底。
+  - 风险：ACH 不是“发起即成功”，后续仍可能出现 insufficient funds、closed account、unauthorized return、bank dispute 与 clawback。公开资料显示 Melon 已把余额不足追缴、dispute 后追偿等场景做成正式规则，这意味着状态回滚、追偿、人工复核和 payout 延迟会持续存在。
 - `信任与合规链路`
   - 壁垒：对 Stripe、Plaid、Dwolla、Wise 等合作方的接入与运营经验会形成门槛。
-  - 风险：成人/订阅内容相关生态对支付合作方的接受度变化较大。`Dwolla` 在 `2025-01-21` 更新的账户条款中把 `adult entertainment` 列为 `Prohibited Activities`，说明这类客群存在直接的支付合作方准入风险。
+  - 风险：成人/订阅内容相关生态对支付合作方的接受度变化较大。`Dwolla` 在 `2025-01-21` 更新的账户条款中把 `adult entertainment` 列为 `Prohibited Activities`，说明这类客群存在直接的支付合作方准入风险；同时，KYC 不完整会直接造成 payout delayed/blocked，部分合作方还可能通过 reserve / hold 机制占压可分配余额。
 - `多供应商编排能力`
   - 壁垒：Stripe、Plaid、Dwolla、Wise 的职责拆分本身就是产品复杂度，谁能把这条链路稳定跑通，谁就更难被简单复制。
-  - 风险：任一供应商的审核、断连、政策或 API 变化，都会放大产品文案、support、合规和技术实现压力。
+  - 风险：任一供应商的审核、断连、政策或 API 变化，都会放大产品文案、support、合规和技术实现压力。对 Melon 这类产品来说，异常通常不是单点失败，而是会跨 Plaid、Dwolla、Stripe 与内部账本同步扩散。
 - `嵌入式替代成本`
   - 壁垒：一旦 agency 把分账、报表和 payout 都迁移到 Melon，切换回 Excel 或手工流程的成本会上升。
   - 风险：更大的 agency OS 一旦内建 payouts 与 ledger，Melon 的差异化可能被压缩。
