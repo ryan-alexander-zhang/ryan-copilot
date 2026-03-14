@@ -1,20 +1,13 @@
 ---
 name: product-web-analysis
 description: >-
-  Analyze a product from a user-provided product name or URL using web
-  search and official public sources, then produce three structured
-  reports in the user's requested language: Product Understanding,
-  Market And Strategy, and Build MVP. Use when Codex needs product
-  analysis, website analysis, product research, competitor analysis,
-  product teardown, reverse analysis of a SaaS or tool, or an MVP build
-  assessment for a similar product, including scope, dependencies,
-  compliance, cost, and technical architecture suggestions. Trigger on
-  requests such as analyze this product, analyze this website, explain
-  this product, summarize this SaaS, infer the architecture, compare
-  these products, assess whether it is worth building, estimate MVP cost
-  or feasibility, or Chinese requests like 分析这个产品、分析这个网站、产品分析、竞品分析、产品拆解、技术架构推断、产品调研、逆向分析这个产品、根据产品名称或URL生成报告、评估能不能做、做MVP拆解、估算开发成本.
-  Generate reports with flowcharts, sequence diagrams, and C4 diagrams
-  while clearly separating confirmed facts from reasoned inference.
+  Analyze a public product from its name or URL using web and official
+  sources, then write four files: Product Understanding, Market And
+  Strategy, Build MVP, and `04-summary.md`. Use for product analysis,
+  website analysis, competitor analysis, reverse analysis, MVP
+  feasibility, or cost/compliance/dependency research. The summary is
+  generated after a light consistency check across the first three
+  reports and never overwrites an existing `summary.md`.
 ---
 
 # Product Web Analysis
@@ -22,7 +15,7 @@ description: >-
 ## Overview
 
 Use this skill to research a public product on the web and turn
-scattered evidence into three structured reports. Accept either a
+scattered evidence into four structured reports. Accept either a
 product name or a product URL, adapt the report language to the user's
 request, and keep a hard boundary between confirmed facts and
 inference.
@@ -30,7 +23,9 @@ inference.
 This skill is primarily for understanding and analyzing an existing
 product as it appears in public. The first two reports stay analytical.
 The third report is the only build-oriented output and should stay
-focused on an early MVP rather than a full PRD.
+focused on an early MVP rather than a full PRD. The fourth report is a
+leader-friendly summary synthesized from the first three reports after a
+light consistency pass.
 
 Typical Chinese triggers include `分析这个产品`, `分析这个网站`, `做一个产品分析`,
 `做竞品分析`, `拆解这个 SaaS`, `推断技术架构`, and `根据这个 URL 做产品调研`.
@@ -40,6 +35,7 @@ Read these templates when you need the full output structure:
 - [references/product-understanding-template.md](references/product-understanding-template.md)
 - [references/market-strategy-template.md](references/market-strategy-template.md)
 - [references/build-mvp-template.md](references/build-mvp-template.md)
+- [references/summary-template.md](references/summary-template.md)
 - [references/diagram-templates.md](references/diagram-templates.md)
 
 ## Minimal Inputs
@@ -57,7 +53,7 @@ Optional:
 - Preferred language for the final report
 - Comparison targets when the user explicitly wants competitor comparison
 - Output format override when the user explicitly wants a single-file
-  report instead of the default three-report output
+  report instead of the default four-report output
 - Output path override when the user explicitly wants a different
   directory; otherwise use the default file output path described below
 
@@ -71,8 +67,8 @@ mode, diagram mode, or terminology mode. Those are internal defaults.
 Unless the user explicitly overrides them, use these defaults:
 
 - Deliverables: always produce `Product Understanding`, `Market And
-  Strategy`, and `Build MVP`
-- Output format: three separate reports
+  Strategy`, `Build MVP`, and `Summary`
+- Output format: four separate reports
 - File output: mandatory
 - Default output directory: relative to the current working directory,
   `reports/{project-name}/`
@@ -80,9 +76,12 @@ Unless the user explicitly overrides them, use these defaults:
   - `01-product-understanding.md`
   - `02-market-and-strategy.md`
   - `03-build-mvp.md`
+  - `04-summary.md`
 - Source policy: official sources first, third-party sources only to fill
   gaps or corroborate
 - Cost research: enabled by default for the `Build MVP` report
+- Validation: run a light consistency check across `01/02/03` before
+  writing `04-summary.md`
 - Diagrams: enabled by default
 - Evidence model: always separate `Confirmed facts` from `Reasoned
   inference`
@@ -111,9 +110,11 @@ Mandatory file-output rule:
 - Do not treat chat-only output as sufficient completion.
 - Even when summarizing results in chat, write the report files first and
   then reference their paths in the response.
+- Never overwrite a pre-existing `summary.md`; the default summary output
+  for this skill is always `04-summary.md`.
 - If the user explicitly asks for a single-file report, still write it to
   disk under `reports/{project-name}/`, using a single Markdown file
-  instead of the three default files.
+  instead of the four default files.
 
 ## Cost Research Default
 
@@ -135,14 +136,15 @@ evidence-gathering task rather than lightweight commentary.
 
 ## Default Deliverables
 
-By default, produce three separate reports rather than one monolithic
+By default, produce four separate reports rather than one monolithic
 report:
 
 1. `Product Understanding`
 2. `Market And Strategy`
 3. `Build MVP`
+4. `Summary`
 
-All three are default outputs. Do not collapse them into one long report
+All four are default outputs. Do not collapse them into one long report
 unless the user explicitly asks for a single-file format.
 
 Default file layout:
@@ -150,6 +152,7 @@ Default file layout:
 - `reports/{project-name}/01-product-understanding.md`
 - `reports/{project-name}/02-market-and-strategy.md`
 - `reports/{project-name}/03-build-mvp.md`
+- `reports/{project-name}/04-summary.md`
 
 These files are mandatory deliverables by default.
 
@@ -176,6 +179,31 @@ By default, organize the `Build MVP` report into these seven sections:
 
 Keep this report simple, staged, and actionable. Avoid turning it into a
 full backlog or enterprise target-state architecture.
+
+## Summary Deliverable
+
+Use [references/summary-template.md](references/summary-template.md) for
+the fourth default output.
+
+The `Summary` report should be a concise management-facing synthesis of
+the first three reports. It should not introduce new unsupported claims
+or redo the full analysis from scratch. Instead, it should:
+
+- summarize only the highest-signal conclusions
+- prefer conclusions that survive the light consistency check
+- compress overlapping points across `01/02/03`
+- preserve uncertainty where needed instead of smoothing it over
+- avoid overwriting or editing any pre-existing `summary.md`; write to
+  `04-summary.md`
+
+Default scope for the light consistency check:
+
+- check whether `01/02/03` materially contradict each other
+- check whether major conclusions still match the cited source links
+- exclude or clearly down-rank claims that are contradicted or weakly
+  supported
+- do not rerun a full deep fact-verification pass unless the user
+  explicitly asks for it
 
 Special requirement for section 5:
 
@@ -380,11 +408,16 @@ Evidence discipline for cost research:
 ### 11. Write the reports to files
 
 - Writing files is mandatory for this skill.
-- By default, write three Markdown files under
+- By default, write four Markdown files under
   `reports/{project-name}/`:
   - `01-product-understanding.md`
   - `02-market-and-strategy.md`
   - `03-build-mvp.md`
+  - `04-summary.md`
+- Write `01/02/03` first, then run the light consistency check, then
+  write `04-summary.md`.
+- Do not overwrite an existing `summary.md`; this skill's default summary
+  output is `04-summary.md`.
 - If the user explicitly requested a single-file output, still write it
   under `reports/{project-name}/` as one Markdown file.
 - After writing the files, return a concise chat response that points to
@@ -404,6 +437,7 @@ Evidence discipline for cost research:
 - Keep the product-analysis reports centered on understanding the product as-is: what it does, who it serves, how it works, what constraints shape it, and what is likely true about its business and technical design.
 - Do not let product-analysis reports drift into implementation advice, backlog design, system design prescriptions, or pseudo-PRD content.
 - Keep build-oriented content in the dedicated `Build MVP` report.
+- Keep management-facing compression in the dedicated `Summary` report.
 - Structure the `Build MVP` report with the seven required sections from
   the Build MVP template.
 - In the `Build MVP` report, explicitly answer which features trigger
@@ -437,6 +471,7 @@ Evidence discipline for cost research:
   - `reports/{project-name}/01-product-understanding.md`
   - `reports/{project-name}/02-market-and-strategy.md`
   - `reports/{project-name}/03-build-mvp.md`
+  - `reports/{project-name}/04-summary.md`
 - In the final chat response, include the written file paths rather than
   only pasting the full report into chat.
 
@@ -447,9 +482,11 @@ Include, at minimum:
 - A `Product Understanding` report
 - A `Market And Strategy` report
 - A `Build MVP` report
+- A `Summary` report
 
 The first two are product-analysis outputs.
 The third is the MVP-build-oriented output.
+The fourth is the management-facing synthesis output.
 
 ## Boundary between analysis and build guidance
 
@@ -458,13 +495,14 @@ Use this distinction consistently:
 - `Product analysis`: what the product appears to do, how it is positioned, how users likely adopt it, what dependencies and risks shape it, what business and technical properties are visible from public evidence.
 - `Build guidance`: what someone should build, in what order, with which scope, modules, or implementation choices.
 
-When the user asks for general product analysis, still produce all three
-default reports, but keep the first two as product analysis and the
-third as the build-oriented `Build MVP` output.
+When the user asks for general product analysis, still produce all four
+default reports, but keep the first two as product analysis, the third
+as the build-oriented `Build MVP` output, and the fourth as the
+validated management-facing summary.
 
 In the build-oriented report, distinguish clearly between:
 
 - The analyzed product's apparent business cost structure
 - The likely build and operating costs someone would face when creating a similar product
 
-Use the three reference templates when the user wants full reusable structures.
+Use the four reference templates when the user wants full reusable structures.
