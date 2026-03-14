@@ -40,6 +40,7 @@
 - Melon 官方文档明确把 `Plaid` 放在 creator 银行连接链路中。
 - Melon 服务条款明确要求启用 `Dwolla` 相关账户与条款。
 - Melon 的 KYC / 税务帮助文档明确提到 `Stripe`，包括 KYC 补件与 1099 tax forms。
+- 如果按 `Stripe US` 官方公开价格口径理解，Melon 这条链路中能被直接量化的主要是 `Identity` 与 `1099` 模块；`generic Connect onboarding` 仍应视为按方案和地区变化、不可用一个统一价格概括。
 
 ### 推断
 
@@ -221,8 +222,11 @@ Melon 不是在争夺“谁是最好用的 OnlyFans agency 软件”，而是在
 - Automated Invoicing with Melon：https://help.getmelon.io/en/articles/12005317-automated-invoicing-with-melon
 - Update your KYC info on Melon：https://help.getmelon.io/en/articles/8987119-update-your-kyc-info-on-melon
 - Understanding Your 1099 Tax Forms with Melon [2024 Tax Season]：https://help.getmelon.io/en/articles/10543097-understanding-your-1099-tax-forms-with-melon-2024-tax-season
+- Stripe Pricing：https://stripe.com/pricing
+- Stripe Connect: 1099：https://stripe.com/connect/1099
 - Stripe Connect onboarding：https://docs.stripe.com/connect/custom/onboarding
 - Stripe tax form delivery：https://docs.stripe.com/connect/deliver-tax-forms
+- Plaid Link introduction：https://plaid.com/docs/link/#introduction-to-link
 - FansMetric Pricing：https://fansmetric.com/pricing
 - Infloww Pricing：https://infloww.com/pricing
 - OFManager Pricing：https://ofmanager.com/pricing

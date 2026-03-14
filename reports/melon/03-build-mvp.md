@@ -299,7 +299,17 @@ flowchart LR
   - 来源：https://plaid.com/pricing/
   - 来源：https://plaid.com/docs/account/billing/
 - Stripe Connect 官方公开页显示：其平台收费模式会因“由 Stripe 向 connected accounts 定价”还是“由平台自行定价”而不同，并按地区显示不同价格；这意味着 agency KYC / tax / connected account 管理本身也是单独的供应商成本面。
-  - 证据等级：`Do not quantify by one global number`
+  - 对 `Connect onboarding` / connected account 管理成本，仍应视为 `Do not quantify by one global number`。
+  - 但对 Melon 明确会用到、且 Stripe US 官方已公开单价的模块，可单独量化：
+    - `Stripe Identity - ID document and selfie verification`：`$1.50 / verification`
+    - `Stripe Identity - ID number lookup`：`$0.50 / lookup`
+    - `Stripe Connect 1099 - IRS e-file`：`$2.99 / 1099`
+    - `Stripe Connect 1099 - state e-file`：`$1.49 / 1099`
+    - `Stripe Connect 1099 - mailed form`：`$2.99 / 1099`
+    - `Stripe Connect 1099 - e-delivery`：`无额外费用`
+  - 证据等级：`High for Identity/1099 public list prices; Do not quantify for generic Connect onboarding`
+  - 来源：https://stripe.com/pricing
+  - 来源：https://stripe.com/connect/1099
   - 来源：https://stripe.com/connect/pricing
 - Dwolla 官方 pricing 页面明确说明是 `custom pricing`，未公开统一标准价。
   - 证据等级：`Do not quantify`
@@ -328,6 +338,13 @@ flowchart LR
 
 - 如果你的 MVP 只做基础 email + SMS 通知，不做重度短信营销，短信本身不是主要成本。
 - 例子：若每月发送 `2,000` 条美国短信，按 Twilio 基础价估算，短信基础发送成本约 ` $16.6/月 `，但还未计入 carrier fee。
+- 如果 agency onboarding 主要落在 `Stripe`，则可按公开单价做一个保守估算：
+  - 每个 agency 完成一次证件+自拍 KYC，约 ` $1.50 / agency `
+  - 若还需要 SSN lookup，再加 ` $0.50 / agency `
+  - 到报税季，若平台为该 agency 生成并向 IRS 电子申报 `1099`，约 ` $2.99 / form `
+  - 若还需要州申报，再加 ` $1.49 / form `
+  - 若未取得电子交付同意而必须邮寄，再加 ` $2.99 / form `
+  - `e-delivery` 本身无额外费用，因此如果用户同意电子交付，税表交付成本会显著低于纸质邮寄。
   - 证据等级：`Medium`
   - 依据：https://www.twilio.com/en-us/sms/pricing/us
 - 对本文推荐的 Plaid 用法来说，最可能触发的是 `Auth` 的一次性费用，而不是 `Transactions` 这类持续订阅费用。
@@ -421,6 +438,8 @@ Rel(admin, api, "人工处理异常")
 - Melon for non-US/Canada agencies：https://help.getmelon.io/en/articles/9020125-melon-for-non-us-canada-agencies
 - Using Melon as a Canadian Creator – Wise US Bank Account Setup：https://help.getmelon.io/en/articles/11994736-using-melon-as-a-canadian-creator-wise-us-bank-account-setup
 - Stripe Connect Pricing：https://stripe.com/connect/pricing
+- Stripe Pricing：https://stripe.com/pricing
+- Stripe Connect: 1099：https://stripe.com/connect/1099
 - Stripe Connect onboarding：https://docs.stripe.com/connect/custom/onboarding
 - Stripe account onboarding component：https://docs.stripe.com/connect/supported-embedded-components/account-onboarding
 - Stripe identity verification：https://docs.stripe.com/connect/identity-verification
@@ -429,6 +448,7 @@ Rel(admin, api, "人工处理异常")
 - Stripe Express tax forms：https://docs.stripe.com/connect/platform-express-dashboard-taxes
 - Plaid Pricing：https://plaid.com/pricing/
 - Plaid Billing Docs：https://plaid.com/docs/account/billing/
+- Plaid Link introduction：https://plaid.com/docs/link/#introduction-to-link
 - Plaid Link overview：https://plaid.com/docs/link/
 - Plaid Link API / link token：https://plaid.com/docs/api/link/#linktokencreate
 - Plaid Items API：https://plaid.com/docs/api/items/

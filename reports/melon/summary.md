@@ -183,7 +183,9 @@ sequenceDiagram
 ## 成本分析
 
 - `显性第三方成本`
-  - `KYC / tax onboarding`：如采用 `Stripe Connect` 或同类方案，agency 端开户、KYC、tax forms 本身也是独立的第三方成本面。Stripe 官方公开的是按方案和地区变化的定价模型，而不是一个适用于所有平台场景的单一价格。
+  - `KYC / tax onboarding`：如采用 `Stripe Connect` 或同类方案，agency 端开户、KYC、tax forms 本身也是独立的第三方成本面。对 `generic Connect onboarding`，Stripe 官方仍是按方案和地区变化定价，不能用一个统一全球价格概括；但对 Melon 明确涉及且 Stripe US 已公开单价的模块，可以单独量化：
+    - `Stripe Identity`：证件+自拍核验 ` $1.50 / verification `，`ID number lookup` 为 ` $0.50 / lookup `。
+    - `Stripe Connect 1099`：向 IRS 电子申报 ` $2.99 / 1099 `，州电子申报 ` $1.49 / 1099 `，纸质邮寄 ` $2.99 / 1099 `，电子交付 `无额外费用`。
   - `银行连接与支付`：`Plaid` 未公开统一标准单价，`Dwolla` 也是 `custom pricing`，需以商务报价为准。
   - `通知与验证`：`Twilio SMS` 美国基础价从 ` $0.0083 / segment ` 起，另有 carrier fee；`Twilio Verify` 为 ` $0.05 / successful verification + $0.0083 / SMS `。以 `2,000` 条短信/月估算，基础短信费用约 ` $16.6/月 `。
   - `跨境能力`：如覆盖国际 agency 或加拿大 creator，`Wise` 一次性开通费 ` $31 `，接收 USD wire ` $6.11 / 笔 `。
@@ -230,7 +232,13 @@ sequenceDiagram
   - 用于支持：Melon 与 Stripe 合作处理 tax reporting，符合条件的用户可通过 Stripe Express 查看税表。
 - `Stripe Connect Pricing`
   - URL：https://stripe.com/connect/pricing
-  - 用于支持：Stripe Connect 的成本模型取决于平台方案与地区，说明 KYC / tax onboarding 本身也是单独的第三方成本面。
+  - 用于支持：Stripe Connect 的通用平台成本模型取决于平台方案与地区，不能用一个统一价格概括所有 onboarding / connected account 场景。
+- `Stripe Pricing`
+  - URL：https://stripe.com/pricing
+  - 用于支持：Stripe US 公开列出了 `Identity` 单价，其中 `ID document and selfie verification = $1.50/verification`，`ID number lookup = $0.50/lookup`。
+- `Stripe Connect: 1099`
+  - URL：https://stripe.com/connect/1099
+  - 用于支持：Stripe US 公开列出了 `1099` 单价，其中 `IRS e-file = $2.99/1099`、`state e-file = $1.49/1099`、`mail = $2.99/1099`、`e-delivery` 无额外费用。
 - `Stripe Connect onboarding`
   - URL：https://docs.stripe.com/connect/custom/onboarding
   - 用于支持：平台可通过 hosted / API 方式完成 connected account onboarding，可映射 agency 侧 KYC 主流程。
@@ -243,6 +251,9 @@ sequenceDiagram
 - `Plaid Pricing and Billing`
   - URL：https://plaid.com/docs/account/billing/
   - 用于支持：Plaid 提供 `Pay as you go / Growth / Custom` 三类 plan；文档中的 `up to $6,000/month`、`over $2,000/month` 是适用规模提示而非公开报价；`Auth` 属一次性收费，`Transactions` 等属于按 Item 的持续订阅；partner 调用也会计入你的账单。
+- `Plaid Link introduction`
+  - URL：https://plaid.com/docs/link/#introduction-to-link
+  - 用于支持：Plaid Link 是终端用户连接其金融账户的前端模块，可用于补充说明 creator 银行连接入口。
 - `Dwolla Pricing`
   - URL：https://www.dwolla.com/pricing/
   - 用于支持：Dwolla 为 `custom pricing`，属于需商务确认的核心支付成本。

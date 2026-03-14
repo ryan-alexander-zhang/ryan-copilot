@@ -307,6 +307,9 @@ Rel(api, notify, "发送通知")
 - Privacy Policy：https://www.getmelon.io/privacy-policy
 - Stripe Connect onboarding：https://docs.stripe.com/connect/custom/onboarding
 - Stripe account onboarding component：https://docs.stripe.com/connect/supported-embedded-components/account-onboarding
+- Stripe Pricing：https://stripe.com/pricing
+- Stripe Connect: 1099：https://stripe.com/connect/1099
 - Stripe tax form delivery：https://docs.stripe.com/connect/deliver-tax-forms
 - Stripe Express tax forms：https://docs.stripe.com/connect/platform-express-dashboard-taxes
 - Stripe identity verification：https://docs.stripe.com/connect/identity-verification
+- Plaid Link introduction：https://plaid.com/docs/link/#introduction-to-link
