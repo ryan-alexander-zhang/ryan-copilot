@@ -1,6 +1,6 @@
 ---
 name: github-repo-capability-validator
-description: "Analyze a GitHub repository from a strict README-first workflow: clone locally, extract claimed core capabilities from the README, decompose the work into reviewable task documents, produce shared and per-capability technical analyses, verify each claim against the checked out codebase, and write an evidence-backed consistency report bundle."
+description: "Analyze a GitHub repository or a user-scoped capability slice from a strict README-first workflow: clone locally, extract claimed core capabilities from the README, decompose the work into reviewable task documents, produce shared and per-capability or per-scope technical analyses, verify each claim against the checked out codebase, and write an evidence-backed consistency report bundle."
 ---
 
 # GitHub Repo Capability Validator
@@ -8,6 +8,8 @@ description: "Analyze a GitHub repository from a strict README-first workflow: c
 ## Purpose
 
 Analyze a GitHub repository by first extracting the project's claimed core capabilities from the README, then generating task-oriented technical analysis documents, and finally validating each analysis against the actual source code.
+
+The default mode is a full repository capability audit. However, if the user explicitly narrows the ask to a subset such as a single capability, request path, command flow, API lifecycle, or create/update/delete chain, switch into a scoped audit mode while preserving the same README-first discipline.
 
 This skill is designed to prevent shallow README paraphrasing. It enforces a strict path:
 
@@ -22,9 +24,11 @@ Collect these inputs when available:
 - `repo_url`: GitHub repository URL.
 - `readme_content`: README text or README file path.
 - `repo_root` or checked out source tree.
+- Optional `analysis_scope`: a user-declared subset such as one capability, one control-plane chain, one API flow, one command path, or one bounded architecture slice.
+- Optional `scope_slug`: a short filesystem-safe slug derived from `analysis_scope` for report naming when scoped mode is active.
 - `report_output_dir`: fixed report directory in the current workspace. Default: `reports/`.
-- `report_filename`: default `<repo-name>-capability-audit.md`, derived from the analyzed repository name.
-- `report_bundle_dir`: default `reports/<repo-name>-capability-audit/` for task-oriented multi-file output.
+- `report_filename`: default `<repo-name>-capability-audit.md`, or `<repo-name>-capability-audit-<scope-slug>.md` in scoped mode.
+- `report_bundle_dir`: default `reports/<repo-name>-capability-audit/`, or `reports/<repo-name>-capability-audit-<scope-slug>/` in scoped mode.
 - Optional `docs/`, configuration files, interface definitions, and key entrypoints.
 - Optional permission to inspect GitHub pull requests with `gh` for recent implementation context.
 
@@ -56,8 +60,11 @@ Before Stage 1:
 - You may read the README from GitHub before clone only when needed to identify the repository, but do not use webpage inspection as a substitute for a local code tree.
 - Create the report output directory in the current workspace if it does not already exist.
 - Plan to write the final Markdown report into the current workspace, not into the analyzed repository.
-- Derive the report filename from the repository name using this fixed convention: `<repo-name>-capability-audit.md`.
-- Derive the report bundle directory from the repository name using this fixed convention: `<repo-name>-capability-audit/`.
+- Detect whether the user requested a full audit or a scoped audit.
+- In full-audit mode, derive the report filename from the repository name using this fixed convention: `<repo-name>-capability-audit.md`.
+- In full-audit mode, derive the report bundle directory from the repository name using this fixed convention: `<repo-name>-capability-audit/`.
+- In scoped-audit mode, derive a short `scope_slug` from the user request and use `<repo-name>-capability-audit-<scope-slug>.md` and `reports/<repo-name>-capability-audit-<scope-slug>/`.
+- Keep the README extraction repository-wide even in scoped mode unless the user explicitly asks to skip repository-wide README extraction.
 - Create a task breakdown document before deep code verification so the work is explicitly decomposed.
 
 ### Stage 1: Extract Claimed Core Capabilities From README Only
@@ -71,6 +78,7 @@ Produce:
   only if the README genuinely exposes fewer.
 - README evidence for each capability.
 - Boundary note for each capability: `what it is / what it is not`.
+- When `analysis_scope` is provided, also produce a short `Scoped audit target` section that maps the requested scope back to one or more README-derived capabilities without pretending the scoped target came directly from README wording if it did not.
 
 Use these extraction rules:
 
@@ -83,9 +91,9 @@ Use these extraction rules:
   the README presents them as default, central behavior.
 - Treat marketing language as a claim, not a fact.
 
-### Stage 2: Write One Technical Analysis Per Capability
+### Stage 2: Write One Technical Analysis Per Capability Or Scoped Investigation Unit
 
-Create one independent section or document per capability. Use the
+Create one independent section or document per capability in full-audit mode. In scoped-audit mode, create one independent section or document per scoped investigation unit. Use the
 fixed structure from `references/report-template.md`.
 
 When README details are incomplete:
@@ -122,10 +130,18 @@ Before capability deep dives, write a task breakdown document that decomposes th
 
 - README-only extraction task
 - entrypoints and main-flow task
-- one task per capability
+- one task per capability in full-audit mode, or one task per scoped investigation unit in scoped-audit mode
 - final consistency summary task
 
 Prefer task decomposition by investigation stage, not only by capability name, so shared code-reading work is done once and reused.
+
+Scoped-audit rules:
+
+- Do not silently expand a user-scoped request back into a full implementation audit.
+- Do keep Stage 1 anchored in README-level repository capabilities so the scoped deep dive still has documented grounding.
+- Do make `02-entrypoints-and-main-flow.md` explicitly scoped when the user asked for a scoped flow.
+- Do make the deep-dive filename and report bundle name reflect the scoped target when scoped mode is active.
+- Do say clearly which adjacent subsystems are intentionally out of scope.
 
 ### Stage 3: Verify Against Code
 
@@ -248,19 +264,24 @@ Runtime heuristics are opt-in only:
 
 Always deliver:
 
-1. A task breakdown document in `report_output_dir/<repo-name>-capability-audit/00-task-breakdown.md`.
-2. A README-only extraction document in `report_output_dir/<repo-name>-capability-audit/01-readme-capability-extraction.md`.
-3. An entrypoints and main-flow document in `report_output_dir/<repo-name>-capability-audit/02-entrypoints-and-main-flow.md`.
-4. One capability document per capability in `report_output_dir/<repo-name>-capability-audit/` using a stable numbered filename such as `03-capability-<name>.md`.
+1. A task breakdown document in `report_output_dir/<bundle-name>/00-task-breakdown.md`.
+2. A README-only extraction document in `report_output_dir/<bundle-name>/01-readme-capability-extraction.md`.
+3. An entrypoints and main-flow document in `report_output_dir/<bundle-name>/02-entrypoints-and-main-flow.md`.
+4. One capability document per capability in full-audit mode, or one scoped deep-dive document per scoped investigation unit in scoped-audit mode, in `report_output_dir/<bundle-name>/` using a stable numbered filename such as `03-capability-<name>.md` or `03-scope-<scope-slug>.md`.
 5. A final overview report with:
    - capability summary table
    - verification status per capability
    - overall README/code consistency judgment
    - key risks
    - five priority code entrypoints for deeper study
-6. A final summary document in `report_output_dir/<repo-name>-capability-audit/99-final-consistency-summary.md`.
+6. A final summary document in `report_output_dir/<bundle-name>/99-final-consistency-summary.md`.
 
-The single-file report `report_output_dir/<repo-name>-capability-audit.md` is optional. Prefer the task-oriented report bundle as the default output.
+Where `<bundle-name>` is:
+
+- `<repo-name>-capability-audit` in full-audit mode
+- `<repo-name>-capability-audit-<scope-slug>` in scoped-audit mode
+
+The single-file report `report_output_dir/<bundle-name>.md` is optional. Prefer the task-oriented report bundle as the default output.
 
 Each capability analysis must include:
 
@@ -286,9 +307,12 @@ Enforce these constraints:
 - Do write the generated report into the current workspace's fixed report directory by default.
 - Do use the fixed filename pattern `<repo-name>-capability-audit.md` by default.
 - Do use the fixed multi-file report bundle directory `<repo-name>-capability-audit/` by default.
+- Do switch to `<repo-name>-capability-audit-<scope-slug>.md` and `<repo-name>-capability-audit-<scope-slug>/` when the user explicitly requested a scoped audit.
 - Do create `00-task-breakdown.md` before deep verification work.
 - Do decompose work into reviewable task documents with smaller scope.
 - Do not backfill capability definitions from code during Stage 1.
+- Do not let scoped mode rename a repository-wide README extraction into a fake scoped README.
+- Do make scoped deep-dive filenames, summary text, and bundle names visibly reflect the declared scope.
 - Do not treat tooling or peripheral features as core capabilities.
 - Do not present README claims as facts until code verification is complete.
 - Do not hide mismatches; state them explicitly.
@@ -327,6 +351,8 @@ In those cases, still provide:
 - partial evidence
 - uncertainty notes
 - recommended next files to inspect
+
+If the repository is intentionally only partially analyzed because the user declared a narrow scope, explicitly state that this was a user-requested scope boundary, not a failure of the skill.
 
 ## Resource Files
 

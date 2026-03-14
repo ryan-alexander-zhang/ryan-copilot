@@ -5,8 +5,10 @@ Use this structure for the report bundle and the final summary report.
 Output location:
 
 - Write the analysis as a multi-file report bundle under the current workspace's fixed `reports/` directory by default.
-- Use the bundle directory pattern `<repo-name>-capability-audit/`.
-- Use the fixed filename pattern `<repo-name>-capability-audit.md`.
+- Use the bundle directory pattern `<repo-name>-capability-audit/` in full-audit mode.
+- Use the bundle directory pattern `<repo-name>-capability-audit-<scope-slug>/` in scoped-audit mode.
+- Use the fixed filename pattern `<repo-name>-capability-audit.md` in full-audit mode.
+- Use the fixed filename pattern `<repo-name>-capability-audit-<scope-slug>.md` in scoped-audit mode.
 - Do not place the report inside the analyzed repository unless the user explicitly asks for that.
 
 Recommended bundle layout:
@@ -14,7 +16,8 @@ Recommended bundle layout:
 - `00-task-breakdown.md`
 - `01-readme-capability-extraction.md`
 - `02-entrypoints-and-main-flow.md`
-- `03-capability-<name>.md` and onward
+- `03-capability-<name>.md` and onward in full-audit mode
+- `03-scope-<scope-slug>.md` and onward in scoped-audit mode
 - `99-final-consistency-summary.md`
 
 ## Stage 0: Task Breakdown
@@ -24,6 +27,7 @@ Create `00-task-breakdown.md` first.
 Required contents:
 
 - repository metadata
+- analysis scope
 - task table
 - dependencies
 - status tracking
@@ -37,6 +41,7 @@ Output:
 
 - `Project positioning`: one sentence.
 - `Core capability list`: `3-8` items when supported.
+- `Scoped audit target`: required when the user narrowed the audit.
 - For each capability:
   - `README evidence`
   - `Boundary`: what it is / what it is not
@@ -60,6 +65,7 @@ Before capability deep dives, create a shared code-reading skeleton in `02-entry
 
 Required contents:
 
+- explicit scope note
 - key entrypoints
 - main flow skeleton
 - architecture notes
@@ -71,7 +77,7 @@ Use `references/entrypoints-main-flow-template.md`.
 
 ## Stage 2: Per-Capability Technical Analysis
 
-Repeat the following block once per capability in its own file.
+Repeat the following block once per capability in full-audit mode, or once per scoped investigation unit in scoped-audit mode.
 
 ```markdown
 # {Capability name}
@@ -171,6 +177,7 @@ Always end the bundle with `99-final-consistency-summary.md`, containing:
 - `PR evidence used? yes/no`
 - `Report path in current workspace`
 - `Task bundle contents`
+- `Scope statement`
 
 Suggested verification table:
 
@@ -249,6 +256,7 @@ classDiagram
 Before finalizing, check:
 
 - Every capability came from README, not reverse-engineering from code.
+- If the user requested a scoped audit, the bundle name, scope statement, and deep-dive filenames reflect that scope.
 - The repository was cloned locally before code verification began.
 - A task breakdown document exists and reflects the work decomposition.
 - A shared entrypoints and main-flow document exists before deep capability files.

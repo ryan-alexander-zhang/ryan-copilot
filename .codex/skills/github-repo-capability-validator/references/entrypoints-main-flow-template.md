@@ -7,6 +7,7 @@ Use this template to create `02-entrypoints-and-main-flow.md`.
 ### 1. Scope
 
 - Repository:
+- Requested audit scope:
 - Goal of this shared investigation:
 - Which later capability tasks will reuse this document:
 
