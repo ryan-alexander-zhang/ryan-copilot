@@ -173,7 +173,7 @@ sequenceDiagram
 ## 风险点
 
 - `平台依赖风险`：OnlyFans、Chaturbate 等平台的打款政策变化会直接影响 Melon 主流程。
-- `支付合作方风险`：成人/订阅内容相关生态对支付合作方的接受度变化较大。
+- `支付合作方风险`：成人/订阅内容相关生态对支付合作方的接受度变化较大。`Dwolla` 在 `2025-01-21` 更新的账户条款中把 `adult entertainment` 列为 `Prohibited Activities`，说明这类客群存在直接的支付合作方准入风险。
 - `账户连接风险`：Plaid 断连、银行凭证更新会导致自动分账失败。
 - `争议与回退风险`：ACH 存在退票、争议、清算延迟，必须依赖人工运营兜底。
 - `多供应商协调风险`：Stripe、Plaid、Dwolla、Wise 分属不同环节，产品文案、support、合规和技术实现必须保持一致。
@@ -257,6 +257,9 @@ sequenceDiagram
 - `Dwolla Pricing`
   - URL：https://www.dwolla.com/pricing/
   - 用于支持：Dwolla 为 `custom pricing`，属于需商务确认的核心支付成本。
+- `Dwolla Account Terms of Service`
+  - URL：https://www.dwolla.com/legal/dwolla-account-terms-of-service
+  - 用于支持：`2025-01-21` 更新版条款把 `adult entertainment` 列为 `Prohibited Activities`，说明成人内容相关客群存在明确的支付合作方政策风险。
 - `Wise Business Pricing`
   - URL：https://wise.com/us/pricing/business/
   - 用于支持：Wise 一次性开通费 ` $31 `，接收 USD wire ` $6.11 / 笔 `。
