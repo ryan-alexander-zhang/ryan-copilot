@@ -71,6 +71,7 @@
   - insufficient funds；
   - KYC 缺资料；
   - payout cutoff 错过。
+- 除了技术与操作异常，还要正视合作方准入风险：`Dwolla` 在 `2025-01-21` 更新的账户条款中把 `adult entertainment` 列为 `Prohibited Activities`。如果目标客群与成人内容生态高度重合，支付合作方政策本身就可能成为比产品实现更早出现的阻断项。
 - 所以第一版就必须预留 support / ops 面板，而不是事后再补。
 
 ## 3. MVP 核心流程
@@ -456,6 +457,7 @@ Rel(admin, api, "人工处理异常")
 - Plaid Update Mode：https://plaid.com/docs/link/update-mode/
 - Plaid + Dwolla integration guide：https://plaid.com/docs/auth/partnerships/dwolla/
 - Dwolla Pricing：https://www.dwolla.com/pricing
+- Dwolla Account Terms of Service：https://www.dwolla.com/legal/dwolla-account-terms-of-service
 - Dwolla Create Customer：https://developers.dwolla.com/docs/api-reference/customers/create-a-customer
 - Dwolla Beneficial Owners：https://developers.dwolla.com/docs/api-reference/beneficial-owners/create-beneficial-owner
 - Dwolla Certify Beneficial Ownership：https://developers.dwolla.com/docs/api-reference/beneficial-owners/certify-beneficial-ownership-status

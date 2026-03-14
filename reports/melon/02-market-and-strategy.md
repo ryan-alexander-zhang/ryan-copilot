@@ -203,7 +203,7 @@ Melon 面临的替代方案，不只是“别的 SaaS”，还包括更原始但
 ## 主要风险
 
 - `平台生态风险`：OnlyFans、Chaturbate 等平台政策调整会波及整个资金流模式。
-- `支付接受度风险`：成人/订阅内容相关生态对支付合作方和银行接受度要求高。
+- `支付接受度风险`：成人/订阅内容相关生态对支付合作方和银行接受度要求高。`Dwolla` 在 `2025-01-21` 更新的账户条款里把 `adult entertainment` 明确列为 `Prohibited Activities`，这说明即使产品流程能跑通，底层支付合作方政策本身也可能直接限制这类客群。
 - `供应商协调风险`：Stripe、Plaid、Dwolla 与 Wise 分别承担不同职责，任何一家调整审核标准、产品政策或 API 行为，都会放大 Melon 的 support 与交付压力。
 - `产品挤压风险`：更大的 agency OS 如果把 payouts 与 ledger 做进去，Melon 的差异化会被稀释。
 - `跨境复杂度风险`：帮助中心展示了国际 agency 和加拿大 creator 路径，但跨境支持越多，支付、税务、KYC 和 support 成本越高。
@@ -227,6 +227,7 @@ Melon 不是在争夺“谁是最好用的 OnlyFans agency 软件”，而是在
 - Stripe Connect onboarding：https://docs.stripe.com/connect/custom/onboarding
 - Stripe tax form delivery：https://docs.stripe.com/connect/deliver-tax-forms
 - Plaid Link introduction：https://plaid.com/docs/link/#introduction-to-link
+- Dwolla Account Terms of Service：https://www.dwolla.com/legal/dwolla-account-terms-of-service
 - FansMetric Pricing：https://fansmetric.com/pricing
 - Infloww Pricing：https://infloww.com/pricing
 - OFManager Pricing：https://ofmanager.com/pricing
