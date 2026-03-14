@@ -1,3 +1,19 @@
+# 个人结论仅供参考
+
+我的初步判断是：这类产品不是不能做，但现阶段更适合定义为“`可做，但要谨慎评估，不建议低估难度`”。表面上看是分账、打款、KYC 这些功能组合，真正难的是支付链路稳定性、异常处理、合规约束和持续运营，这部分门槛通常高于功能开发本身。
+
+核心原因有三点。
+* 显性成本不低，`KYC / tax / bank linking / payout / notification` 都会持续产生第三方成本。
+* 隐性成本更高，包括准备金占压和兜底、退票（可能引发后续一系列动作比如账户冻结等）、争议追偿、KYC 补件、人工审核和客服 support
+* 这类业务对行业经验依赖很强，如果团队缺少支付、金融合规或相关垂直场景经验，遇到资金异常、账户风控或合作方政策变化时，处理不当容易带来直接亏损，甚至放大法务风险。
+
+风险上，当前至少有三个需要重点关注。
+* 获客层面，如果没有行业资历、案例或支付稳定性背书，前期不容易说服 `agency` 迁移。
+* 合作方层面，底层支付能力受第三方约束明显，例如 `Dwolla` 条款对 `adult entertainment` 有明确限制，这意味着目标客群和支付合作方政策之间存在天然张力。
+* 运营层面，实际会持续遇到退票、KYC 补件、风控冻结、payout 延迟等问题，很多都需要人工介入，不是上线后就能自动跑顺的业务。
+
+所以更稳妥的结论不是“能不能复刻 Melon”，而是“在没有相关行业经验沉淀之前，是否值得承担这类业务复杂度和风险成本”。如果后续要推进，前提最好是先补齐有支付/金融合规经验的产品、研发或运营角色，否则即使产品能上线，后续也可能被异常处理和合作方约束拖入高成本区。
+
 # Melon 产品概述
 
 - Melon 是一个面向创作者经纪公司（Agency）的收入分账与回款自动化产品，核心不是内容运营，而是把“创作者收款后如何按协议分钱、催款、对账、周结”做成标准化工作流。
@@ -5,7 +21,7 @@
 - 产品当前覆盖两类主流程：
   - `Creator Split`：创作者在 OnlyFans、Chaturbate 等平台收款后，Melon 自动向创作者扣回 agency 分成，并按周打款给 agency。
   - `Invoice Split`：基于 FansMetric 数据生成账单链接，通过短信或邮件向 creator 收款。
-- 商业模式是交易抽成而不是席位费：对 agency 的收费从其 `agency cut` 的 `5%` 起；referral recipient 额外支付 `2%` 转账费。
+- 商业模式是交易抽成而不是席位费：对 agency 的收费从其 `agency cut` 的 `5%` 起(`50K$/Mo` `4.85%`， `100K$/Mo` `4.6%`， `500K$` contact sales)；referral recipient 额外支付 `2%` 转账费。
 - 本质上，Melon 是 creator agency 生态中的 `payment layer`，不是全栈 agency OS。
 
 # 参与角色
@@ -133,9 +149,10 @@ sequenceDiagram
   Platform->>Creator: 平台收入入账
   Melon->>Dwolla: 发起 ACH 扣款 / 跟踪清算状态
   Dwolla-->>Melon: 返回成功 / 失败 / 待处理状态
+  Agency->>Melon: 可选配置 referral / chat team split
   Melon-->>Agency: 周度 payout 与报表
-  Agency->>Melon: 可选配置 referral split
-  Melon-->>Referral: 次周发起二次 payout
+  Melon->>Melon: 基于 agency payout 计算第三方应分金额
+  Melon-->>Referral: 下一个 payout 周期发起二次 payout
   Melon-->>Creator: 异常提醒 / invoice 支付链接
 ```
 
