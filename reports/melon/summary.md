@@ -151,14 +151,26 @@ sequenceDiagram
 - Automated Invoicing：基于 FansMetric 数据生成账单链接，并通过短信/邮件催收。
 - Support / exception handling：处理资金不足、断连、补件、争议等异常。
 
-# 护城河
+# 竞争壁垒与核心风险
 
-- `垂直工作流理解`：不是泛支付工具，而是深度贴合 creator agency 的“关系型分账”场景。
-- `金融正确性`：真正难点在账本、状态机、异常处理、周结和争议处理，不在前端界面。
-- `信任与合规链路`：对 Stripe、Plaid、Dwolla、Wise 等合作方的接入与运营经验会形成门槛。
-- `多供应商编排能力`：Stripe、Plaid、Dwolla、Wise 的职责拆分本身就是产品复杂度，谁能把这条链路稳定跑通，谁就更难被简单复制。
-- `嵌入式替代成本`：一旦 agency 把分账、报表和 payout 都迁移到 Melon，切换回 Excel 或手工流程的成本会上升。
-- `运营经验沉淀`：对 relink、insufficient funds、KYC 缺资料、cutoff 等异常的处理方式会形成隐性壁垒。
+- `垂直工作流理解`
+  - 壁垒：Melon 不是泛支付工具，而是深度贴合 creator agency 的“关系型分账”场景。
+  - 风险：高度依赖 OnlyFans、Chaturbate 等上游平台的打款规则与生态稳定性，平台政策变化会直接冲击主流程。
+- `金融正确性与异常处理`
+  - 壁垒：真正难点在账本、状态机、异常处理、周结和争议处理，不在前端界面。
+  - 风险：ACH 存在退票、争议、清算延迟，必须长期依赖人工运营与异常兜底。
+- `信任与合规链路`
+  - 壁垒：对 Stripe、Plaid、Dwolla、Wise 等合作方的接入与运营经验会形成门槛。
+  - 风险：成人/订阅内容相关生态对支付合作方的接受度变化较大。`Dwolla` 在 `2025-01-21` 更新的账户条款中把 `adult entertainment` 列为 `Prohibited Activities`，说明这类客群存在直接的支付合作方准入风险。
+- `多供应商编排能力`
+  - 壁垒：Stripe、Plaid、Dwolla、Wise 的职责拆分本身就是产品复杂度，谁能把这条链路稳定跑通，谁就更难被简单复制。
+  - 风险：任一供应商的审核、断连、政策或 API 变化，都会放大产品文案、support、合规和技术实现压力。
+- `嵌入式替代成本`
+  - 壁垒：一旦 agency 把分账、报表和 payout 都迁移到 Melon，切换回 Excel 或手工流程的成本会上升。
+  - 风险：更大的 agency OS 一旦内建 payouts 与 ledger，Melon 的差异化可能被压缩。
+- `运营经验沉淀`
+  - 壁垒：对 relink、insufficient funds、KYC 缺资料、cutoff 等异常的处理方式会形成隐性壁垒。
+  - 风险：国际 agency 与加拿大 creator 路径会继续放大 KYC、支付、support 和文档一致性复杂度。
 
 # 附录
 
@@ -169,16 +181,6 @@ sequenceDiagram
 - `Invoice Split`：按账单向 creator 收款，而不是等平台入账后再扣款。
 - `KYC / KYB`：个人/企业身份与主体核验。
 - `ACH`：美国银行间电子清算网络，成本低但到账慢且可退回。
-
-## 风险点
-
-- `平台依赖风险`：OnlyFans、Chaturbate 等平台的打款政策变化会直接影响 Melon 主流程。
-- `支付合作方风险`：成人/订阅内容相关生态对支付合作方的接受度变化较大。`Dwolla` 在 `2025-01-21` 更新的账户条款中把 `adult entertainment` 列为 `Prohibited Activities`，说明这类客群存在直接的支付合作方准入风险。
-- `账户连接风险`：Plaid 断连、银行凭证更新会导致自动分账失败。
-- `争议与回退风险`：ACH 存在退票、争议、清算延迟，必须依赖人工运营兜底。
-- `多供应商协调风险`：Stripe、Plaid、Dwolla、Wise 分属不同环节，产品文案、support、合规和技术实现必须保持一致。
-- `跨境复杂度风险`：国际 agency 与加拿大 creator 路径会显著增加 KYC、支付、support 复杂度。
-- `文档一致性风险`：公开条款与帮助中心对国际支持边界存在不完全一致之处。
 
 ## 成本分析
 
