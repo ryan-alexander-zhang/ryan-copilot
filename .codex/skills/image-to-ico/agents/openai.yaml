@@ -1,0 +1,4 @@
+interface:
+  display_name: "Image To ICO"
+  short_description: "Convert one image into per-size icon assets."
+  default_prompt: "Use $image-to-ico to turn an input image into per-size icon assets, using ICO for 16, 20, 24, 32, 48, and 128, and PNG for 512."
